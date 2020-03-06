@@ -184,6 +184,17 @@ ev_toolbar_find_button_sensitive_changed (GtkWidget  *find_button,
 }
 
 static void
+ev_custom_icon_to_builtin_theme (const gchar *icon_file_path,
+         const gchar *custom_icon_name)
+{
+  GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file(icon_file_path, NULL);
+  int width, height;
+  gdk_pixbuf_get_file_info (icon_file_path, &width, &height);
+  gtk_icon_theme_add_builtin_icon (custom_icon_name, width, pixbuf);
+  g_object_unref (G_OBJECT(pixbuf));
+}
+
+static void
 ev_toolbar_constructed (GObject *object)
 {
         EvToolbar      *ev_toolbar = EV_TOOLBAR (object);

@@ -403,9 +403,11 @@ static void     ev_window_destroy_recent_view           (EvWindow         *ev_wi
 static void     recent_view_item_activated_cb           (EvRecentView     *recent_view,
                                                          const char       *uri,
                                                          EvWindow         *ev_window);
+static void 	ev_window_cancel_add_annot(EvWindow *window);
 static void     ev_window_begin_add_annot               (EvWindow         *ev_window,
-							 EvAnnotationType  annot_type);
-static void	ev_window_cancel_add_annot		(EvWindow *window);
+															EvAnnotationType  annot_type,
+															EvAnnotationTextMarkupType annot_markup_type,
+															EvAnnotationColor	annot_color);
 
 static gchar *nautilus_sendto = NULL;
 
@@ -6061,7 +6063,17 @@ ev_window_cmd_add_highlight_annotation (GSimpleAction *action,
 {
 	EvWindow *ev_window = user_data;
 
-	ev_window_begin_add_annot (ev_window, EV_ANNOTATION_TYPE_TEXT_MARKUP);
+	ev_window_begin_add_annot (ev_window, EV_ANNOTATION_TYPE_TEXT_MARKUP, EV_ANNOTATION_TEXT_MARKUP_HIGHLIGHT, EV_ANNOTATION_COLOR_YELLOW);
+}
+
+static void
+ev_window_cmd_add_underline_annotation (GSimpleAction *action,
+                                        GVariant      *state,
+                                        gpointer       user_data)
+{
+	EvWindow *ev_window = user_data;
+
+	ev_window_begin_add_annot (ev_window, EV_ANNOTATION_TYPE_TEXT_MARKUP, EV_ANNOTATION_TEXT_MARKUP_UNDERLINE, EV_ANNOTATION_COLOR_NONE);
 }
 
 static void
@@ -6071,7 +6083,7 @@ ev_window_cmd_add_annotation (GSimpleAction *action,
 {
 	EvWindow *ev_window = user_data;
 
-	ev_window_begin_add_annot (ev_window, EV_ANNOTATION_TYPE_TEXT);
+	ev_window_begin_add_annot (ev_window, EV_ANNOTATION_TYPE_TEXT, EV_ANNOTATION_TEXT_MARKUP_NONE, EV_ANNOTATION_COLOR_YELLOW);
 }
 
 static void
@@ -6425,6 +6437,7 @@ static const GActionEntry actions[] = {
 	{ "caret-navigation", NULL, NULL, "false", ev_window_cmd_view_toggle_caret_navigation },
 	{ "add-annotation", NULL, NULL, "false", ev_window_cmd_add_annotation },
 	{ "highlight-annotation", NULL, NULL, "false", ev_window_cmd_add_highlight_annotation },
+	{ "underline-annotation", NULL, NULL, "false", ev_window_cmd_add_underline_annotation },
 	{ "toggle-edit-annots", NULL, NULL, "false", ev_window_cmd_toggle_edit_annots },
 	{ "about", ev_window_cmd_about },
 	{ "help", ev_window_cmd_help },
@@ -6492,17 +6505,21 @@ sidebar_annots_annot_activated_cb (EvSidebarAnnotations *sidebar_annots,
 
 static void
 ev_window_begin_add_annot (EvWindow        *window,
-			   EvAnnotationType annot_type)
+			   EvAnnotationType annot_type,
+			   EvAnnotationTextMarkupType annot_markup_type,
+			   EvAnnotationColor	annot_color)
 {
 	EvWindowPrivate *priv = GET_PRIVATE (window);
 
+	//TODO: NEED TO REWORK THIS TO WORK WITH TRANSFERRED CHANGES
 	if (annot_type == EV_ANNOTATION_TYPE_TEXT_MARKUP &&
 	    ev_view_get_has_selection (EV_VIEW (priv->view))) {
-		ev_view_add_text_markup_annotation_for_selected_text (EV_VIEW (priv->view));
+		ev_view_add_text_markup_annotation_for_selected_text (EV_VIEW (priv->view), annot_markup_type, annot_color);
 		return;
 	}
 
-	ev_view_begin_add_annotation (EV_VIEW (priv->view), annot_type);
+	//ev_view_begin_add_annotation (EV_VIEW (priv->view), annot_type);
+	ev_view_begin_add_annotation (EV_VIEW (priv->view), annot_type, annot_markup_type, annot_color);
 }
 
 static void
@@ -6907,7 +6924,7 @@ ev_window_popup_cmd_annotate_selected_text (GSimpleAction *action,
 	EvWindow *ev_window = user_data;
 	EvWindowPrivate *priv = GET_PRIVATE (ev_window);
 	EvView *view = EV_VIEW (priv->view);
-	ev_view_add_text_markup_annotation_for_selected_text (view);
+	ev_view_add_text_markup_annotation_for_selected_text (view, EV_ANNOTATION_TEXT_MARKUP_HIGHLIGHT, EV_ANNOTATION_COLOR_YELLOW);
 }
 
 static void

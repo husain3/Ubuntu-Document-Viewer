@@ -14,6 +14,15 @@ actions = [
 icons += [['16x16', actions, ['x-office-presentation.png']]]
 
 actions = [
+  'evince-comment-annotation.png',
+  'evince-cyan-highlight-annotation.png',
+  'evince-format-text-squiggly.png',
+  'evince-format-text-strikethrough.png',
+  'evince-format-text-underline.png',
+  'evince-green-highlight-annotation.png',
+  'evince-highlight-annotation.png',
+  'evince-magenta-highlight-annotation.png',
+  'evince-yellow-highlight-annotation.png',
   'object-rotate-left.png',
   'object-rotate-right.png',
   'view-page-continuous.png',
