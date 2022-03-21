@@ -165,9 +165,13 @@ void           ev_view_focus_annotation      (EvView          *view,
 					      EvMapping       *annot_mapping);
 EV_PUBLIC
 void           ev_view_begin_add_annotation  (EvView          *view,
-					      EvAnnotationType annot_type,
-					      EvAnnotationTextMarkupType annot_markup_type,
-					      EvAnnotationColor annot_color);
+					      EvAnnotationType annot_type);
+
+EV_PUBLIC
+void 			ev_view_begin_add_annotation1	(EvView *view,
+								  EvAnnotationType annot_type,
+								  EvAnnotationTextMarkupType annot_markup_type,
+								  EvAnnotationColor annot_color);
 EV_PUBLIC
 void           ev_view_cancel_add_annotation (EvView          *view);
 EV_PUBLIC
@@ -177,7 +181,10 @@ EV_PUBLIC
 GdkColor      ev_view_annotation_color	     (EvView          *view);
 
 EV_PUBLIC
-gboolean       ev_view_add_text_markup_annotation_for_selected_text (EvView  *view,
+gboolean 		ev_view_add_text_markup_annotation_for_selected_text(EvView *view);
+
+EV_PUBLIC
+gboolean       ev_view_add_text_markup_annotation_for_selected_text1 (EvView  *view,
 									  EvAnnotationTextMarkupType annot_markup_type,
 									  EvAnnotationColor	annot_color);
 EV_PUBLIC

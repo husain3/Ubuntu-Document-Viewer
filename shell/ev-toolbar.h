@@ -22,6 +22,7 @@
 
 #include <gtk/gtk.h>
 #include "ev-window.h"
+#include "ev-annotation-action.h"
 
 G_BEGIN_DECLS
 
@@ -57,5 +58,8 @@ GtkWidget    *ev_toolbar_get_page_selector  (EvToolbar *ev_toolbar);
 void          ev_toolbar_set_mode           (EvToolbar     *ev_toolbar,
 					     EvToolbarMode  mode);
 EvToolbarMode ev_toolbar_get_mode           (EvToolbar     *ev_toolbar);
+
+void ev_toolbar_select_annotation_type(EvToolbar *ev_toolbar,
+									   EvAnnotationActionType annot_type);
 
 G_END_DECLS

@@ -86,6 +86,13 @@ evpresentationview.white-mode {
     padding-right: 2px;
 }
 
+.disclosure-button
+{
+  padding-left: 4px;
+  padding-right: 4px;
+  min-width: 0;
+}
+
 .tnum {
     font-feature-settings: "tnum 1";
 }

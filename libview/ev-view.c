@@ -4011,8 +4011,22 @@ ev_view_focus_annotation (EvView    *view,
 				     ev_annotation_get_page_index (EV_ANNOTATION (annot_mapping->data)));
 }
 
+void ev_view_begin_add_annotation(EvView *view,
+								  EvAnnotationType annot_type)
+{
+	if (annot_type == EV_ANNOTATION_TYPE_UNKNOWN)
+		return;
+
+	if (view->adding_annot_info.adding_annot)
+		return;
+
+	view->adding_annot_info.adding_annot = TRUE;
+	view->adding_annot_info.type = annot_type;
+	ev_view_set_cursor(view, EV_VIEW_CURSOR_ADD);
+}
+
 void
-ev_view_begin_add_annotation (EvView          *view,
+ev_view_begin_add_annotation1 (EvView          *view,
 			      EvAnnotationType annot_type,
 			      EvAnnotationTextMarkupType annot_markup_type,
 			      EvAnnotationColor annot_color)
@@ -6607,7 +6621,51 @@ ev_view_get_selected_text (EvView *view)
  * Since: 3.30
  */
 gboolean
-ev_view_add_text_markup_annotation_for_selected_text (EvView  *view,
+ev_view_add_text_markup_annotation_for_selected_text(EvView *view)
+{
+	GList *l;
+
+	if (view->adding_annot_info.annot || view->adding_annot_info.adding_annot ||
+		view->selection_info.selections == NULL)
+		return FALSE;
+
+	for (l = view->selection_info.selections; l != NULL; l = l->next)
+	{
+		EvViewSelection *selection = (EvViewSelection *)l->data;
+
+		view->adding_annot_info.adding_annot = TRUE;
+		view->adding_annot_info.type = EV_ANNOTATION_TYPE_TEXT_MARKUP;
+
+		ev_view_create_annotation_from_selection(view, selection);
+
+		if (view->adding_annot_info.adding_annot)
+			g_signal_emit(view, signals[SIGNAL_ANNOT_ADDED], 0, view->adding_annot_info.annot);
+	}
+
+	clear_selection(view);
+
+	view->adding_annot_info.adding_annot = FALSE;
+	view->adding_annot_info.annot = NULL;
+
+	return TRUE;
+}
+
+/**
+ * ev_view_add_text_markup_annotation_for_selected_text:
+ * @view: #EvView instance
+ *
+ * Adds a Text Markup annotation (defaulting to a 'highlight' one) to
+ * the currently selected text on the document.
+ *
+ * When the selected text spans more than one page, it will add a
+ * corresponding annotation for each page that contains selected text.
+ *
+ * Returns: %TRUE if annotations were added successfully, %FALSE otherwise.
+ *
+ * Since: 3.30
+ */
+gboolean
+ev_view_add_text_markup_annotation_for_selected_text1 (EvView  *view,
 									EvAnnotationTextMarkupType annot_markup_type,
 									EvAnnotationColor	annot_color)
 {

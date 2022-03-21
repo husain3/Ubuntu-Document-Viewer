@@ -45,6 +45,7 @@
 #include "dzl-file-manager.h"
 #include "ev-find-sidebar.h"
 #include "ev-annotations-toolbar.h"
+#include "ev-annotation-action.h"
 #include "ev-application.h"
 #include "ev-document-factory.h"
 #include "ev-document-find.h"
@@ -6103,6 +6104,30 @@ ev_window_cmd_toggle_edit_annots (GSimpleAction *action,
 }
 
 static void
+ev_window_change_select_annotation_action_state(GSimpleAction *action,
+												GVariant *state,
+												gpointer user_data)
+{
+	EvWindow *ev_window = user_data;
+	EvWindowPrivate *priv = GET_PRIVATE(ev_window);
+	EvToolbar *toolbar;
+	const gchar *mode;
+
+	toolbar = priv->toolbar ? EV_TOOLBAR(priv->toolbar) : EV_TOOLBAR(priv->toolbar);
+
+	mode = g_variant_get_string(state, NULL);
+
+	if (g_str_equal(mode, "note"))
+		ev_toolbar_select_annotation_type(toolbar, EV_ANNOTATION_ACTION_TYPE_NOTE);
+	else if (g_str_equal(mode, "highlight"))
+		ev_toolbar_select_annotation_type(toolbar, EV_ANNOTATION_ACTION_TYPE_HIGHLIGHT);
+	else
+		g_assert_not_reached();
+
+	g_simple_action_set_state(action, state);
+}
+
+static void
 ev_window_dispose (GObject *object)
 {
 	EvWindow *window = EV_WINDOW (object);
@@ -6384,76 +6409,76 @@ ev_window_class_init (EvWindowClass *ev_window_class)
 }
 
 static const GActionEntry actions[] = {
-	{ "new", ev_window_cmd_new_window },
-	{ "open", ev_window_cmd_file_open },
-	{ "open-copy", ev_window_cmd_file_open_copy },
-	{ "save-as", ev_window_cmd_save_as },
-	{ "send-to", ev_window_cmd_send_to },
-	{ "open-containing-folder", ev_window_cmd_open_containing_folder },
-	{ "print", ev_window_cmd_file_print },
-	{ "show-properties", ev_window_cmd_file_properties },
-	{ "copy", ev_window_cmd_edit_copy },
-	{ "select-all", ev_window_cmd_edit_select_all },
-	{ "save-settings", ev_window_cmd_edit_save_settings },
-	{ "go-previous-page", ev_window_cmd_go_previous_page },
-	{ "go-next-page", ev_window_cmd_go_next_page },
-	{ "go-first-page", ev_window_cmd_go_first_page },
-	{ "go-last-page", ev_window_cmd_go_last_page },
-	{ "go-forward", ev_window_cmd_go_forward },
-	{ "go-backwards", ev_window_cmd_go_backwards },
-	{ "go-back-history", ev_window_cmd_go_back_history },
-	{ "go-forward-history", ev_window_cmd_go_forward_history },
-	{ "find", ev_window_cmd_find },
-	{ "toggle-find", NULL, NULL, "false", ev_window_cmd_toggle_find },
-	{ "find-next", ev_window_cmd_edit_find_next },
-	{ "find-previous", ev_window_cmd_edit_find_previous },
-	{ "select-page", ev_window_cmd_focus_page_selector },
-	{ "continuous", NULL, NULL, "true", ev_window_cmd_continuous },
-	{ "dual-page", NULL, NULL, "false", ev_window_cmd_dual },
-	{ "dual-odd-left", NULL, NULL, "false", ev_window_cmd_dual_odd_pages_left },
-	{ "rtl", NULL, NULL, "false", ev_window_cmd_rtl },
-	{ "show-side-pane", NULL, NULL, "false", ev_window_view_cmd_toggle_sidebar },
-	{ "inverted-colors", NULL, NULL, "false", ev_window_cmd_view_inverted_colors },
-	{ "enable-spellchecking", NULL, NULL, "false", ev_window_cmd_view_enable_spellchecking },
-	{ "fullscreen", NULL, NULL, "false", ev_window_cmd_view_fullscreen },
-	{ "presentation", ev_window_cmd_view_presentation },
-	{ "rotate-left", ev_window_cmd_edit_rotate_left },
-	{ "rotate-right", ev_window_cmd_edit_rotate_right },
-	{ "zoom-in", ev_window_cmd_view_zoom_in },
-	{ "zoom-out", ev_window_cmd_view_zoom_out },
-	{ "reload", ev_window_cmd_view_reload },
-	{ "auto-scroll", ev_window_cmd_view_autoscroll },
-	{ "add-bookmark", ev_window_cmd_bookmarks_add },
-	{ "delete-bookmark", ev_window_cmd_bookmarks_delete },
-	{ "goto-bookmark", ev_window_activate_goto_bookmark_action, "u" },
-	{ "close", ev_window_cmd_file_close_window },
-	{ "scroll-forward", ev_window_cmd_scroll_forward },
-	{ "scroll-backwards", ev_window_cmd_scroll_backwards },
-	{ "sizing-mode", NULL, "s", "'free'", ev_window_change_sizing_mode_action_state },
-	{ "zoom", ev_window_cmd_view_zoom, "d" },
-	{ "default-zoom", ev_window_cmd_set_default_zoom },
-	{ "escape", ev_window_cmd_escape },
-	{ "toggle-menu", ev_window_cmd_action_menu },
-	{ "caret-navigation", NULL, NULL, "false", ev_window_cmd_view_toggle_caret_navigation },
-	{ "add-annotation", NULL, NULL, "false", ev_window_cmd_add_annotation },
-	{ "highlight-annotation", NULL, NULL, "false", ev_window_cmd_add_highlight_annotation },
-	{ "underline-annotation", NULL, NULL, "false", ev_window_cmd_add_underline_annotation },
-	{ "toggle-edit-annots", NULL, NULL, "false", ev_window_cmd_toggle_edit_annots },
-	{ "about", ev_window_cmd_about },
-	{ "help", ev_window_cmd_help },
+	{"new", ev_window_cmd_new_window},
+	{"open", ev_window_cmd_file_open},
+	{"open-copy", ev_window_cmd_file_open_copy},
+	{"save-as", ev_window_cmd_save_as},
+	{"send-to", ev_window_cmd_send_to},
+	{"open-containing-folder", ev_window_cmd_open_containing_folder},
+	{"print", ev_window_cmd_file_print},
+	{"show-properties", ev_window_cmd_file_properties},
+	{"copy", ev_window_cmd_edit_copy},
+	{"select-all", ev_window_cmd_edit_select_all},
+	{"save-settings", ev_window_cmd_edit_save_settings},
+	{"go-previous-page", ev_window_cmd_go_previous_page},
+	{"go-next-page", ev_window_cmd_go_next_page},
+	{"go-first-page", ev_window_cmd_go_first_page},
+	{"go-last-page", ev_window_cmd_go_last_page},
+	{"go-forward", ev_window_cmd_go_forward},
+	{"go-backwards", ev_window_cmd_go_backwards},
+	{"go-back-history", ev_window_cmd_go_back_history},
+	{"go-forward-history", ev_window_cmd_go_forward_history},
+	{"find", ev_window_cmd_find},
+	{"toggle-find", NULL, NULL, "false", ev_window_cmd_toggle_find},
+	{"find-next", ev_window_cmd_edit_find_next},
+	{"find-previous", ev_window_cmd_edit_find_previous},
+	{"select-page", ev_window_cmd_focus_page_selector},
+	{"continuous", NULL, NULL, "true", ev_window_cmd_continuous},
+	{"dual-page", NULL, NULL, "false", ev_window_cmd_dual},
+	{"dual-odd-left", NULL, NULL, "false", ev_window_cmd_dual_odd_pages_left},
+	{"rtl", NULL, NULL, "false", ev_window_cmd_rtl},
+	{"show-side-pane", NULL, NULL, "false", ev_window_view_cmd_toggle_sidebar},
+	{"inverted-colors", NULL, NULL, "false", ev_window_cmd_view_inverted_colors},
+	{"enable-spellchecking", NULL, NULL, "false", ev_window_cmd_view_enable_spellchecking},
+	{"fullscreen", NULL, NULL, "false", ev_window_cmd_view_fullscreen},
+	{"presentation", ev_window_cmd_view_presentation},
+	{"rotate-left", ev_window_cmd_edit_rotate_left},
+	{"rotate-right", ev_window_cmd_edit_rotate_right},
+	{"zoom-in", ev_window_cmd_view_zoom_in},
+	{"zoom-out", ev_window_cmd_view_zoom_out},
+	{"reload", ev_window_cmd_view_reload},
+	{"auto-scroll", ev_window_cmd_view_autoscroll},
+	{"add-bookmark", ev_window_cmd_bookmarks_add},
+	{"delete-bookmark", ev_window_cmd_bookmarks_delete},
+	{"goto-bookmark", ev_window_activate_goto_bookmark_action, "u"},
+	{"close", ev_window_cmd_file_close_window},
+	{"scroll-forward", ev_window_cmd_scroll_forward},
+	{"scroll-backwards", ev_window_cmd_scroll_backwards},
+	{"sizing-mode", NULL, "s", "'free'", ev_window_change_sizing_mode_action_state},
+	{"zoom", ev_window_cmd_view_zoom, "d"},
+	{"default-zoom", ev_window_cmd_set_default_zoom},
+	{"escape", ev_window_cmd_escape},
+	{"toggle-menu", ev_window_cmd_action_menu},
+	{"caret-navigation", NULL, NULL, "false", ev_window_cmd_view_toggle_caret_navigation},
+	{"add-annotation", NULL, NULL, "false", ev_window_cmd_add_annotation},
+	{"highlight-annotation", NULL, NULL, "false", ev_window_cmd_add_highlight_annotation},
+	{"underline-annotation", NULL, NULL, "false", ev_window_cmd_add_underline_annotation},
+	{"toggle-edit-annots", NULL, NULL, "false", ev_window_cmd_toggle_edit_annots},
+	{"select-annotation", NULL, "s", "'note'", ev_window_change_select_annotation_action_state},
+	{"about", ev_window_cmd_about},
+	{"help", ev_window_cmd_help},
 	/* Popups specific items */
-	{ "annotate-selected-text", ev_window_popup_cmd_annotate_selected_text },
-	{ "open-link", ev_window_popup_cmd_open_link },
-	{ "open-link-new-window", ev_window_popup_cmd_open_link_new_window },
-	{ "go-to-link", ev_window_popup_cmd_open_link },
-	{ "copy-link-address", ev_window_popup_cmd_copy_link_address },
-	{ "save-image", ev_window_popup_cmd_save_image_as },
-	{ "copy-image", ev_window_popup_cmd_copy_image },
-	{ "open-attachment", ev_window_popup_cmd_open_attachment },
-	{ "save-attachment", ev_window_popup_cmd_save_attachment_as },
-	{ "annot-properties", ev_window_popup_cmd_annot_properties },
-	{ "remove-annot", ev_window_popup_cmd_remove_annotation }
-};
+	{"annotate-selected-text", ev_window_popup_cmd_annotate_selected_text},
+	{"open-link", ev_window_popup_cmd_open_link},
+	{"open-link-new-window", ev_window_popup_cmd_open_link_new_window},
+	{"go-to-link", ev_window_popup_cmd_open_link},
+	{"copy-link-address", ev_window_popup_cmd_copy_link_address},
+	{"save-image", ev_window_popup_cmd_save_image_as},
+	{"copy-image", ev_window_popup_cmd_copy_image},
+	{"open-attachment", ev_window_popup_cmd_open_attachment},
+	{"save-attachment", ev_window_popup_cmd_save_attachment_as},
+	{"annot-properties", ev_window_popup_cmd_annot_properties},
+	{"remove-annot", ev_window_popup_cmd_remove_annotation}};
 
 static void
 sidebar_links_link_activated_cb (EvSidebarLinks *sidebar_links, EvLink *link, EvWindow *window)
@@ -6514,12 +6539,12 @@ ev_window_begin_add_annot (EvWindow        *window,
 	//TODO: NEED TO REWORK THIS TO WORK WITH TRANSFERRED CHANGES
 	if (annot_type == EV_ANNOTATION_TYPE_TEXT_MARKUP &&
 	    ev_view_get_has_selection (EV_VIEW (priv->view))) {
-		ev_view_add_text_markup_annotation_for_selected_text (EV_VIEW (priv->view), annot_markup_type, annot_color);
+		ev_view_add_text_markup_annotation_for_selected_text1 (EV_VIEW (priv->view), annot_markup_type, annot_color);
 		return;
 	}
 
 	//ev_view_begin_add_annotation (EV_VIEW (priv->view), annot_type);
-	ev_view_begin_add_annotation (EV_VIEW (priv->view), annot_type, annot_markup_type, annot_color);
+	ev_view_begin_add_annotation1 (EV_VIEW (priv->view), annot_type, annot_markup_type, annot_color);
 }
 
 static void
@@ -6924,7 +6949,7 @@ ev_window_popup_cmd_annotate_selected_text (GSimpleAction *action,
 	EvWindow *ev_window = user_data;
 	EvWindowPrivate *priv = GET_PRIVATE (ev_window);
 	EvView *view = EV_VIEW (priv->view);
-	ev_view_add_text_markup_annotation_for_selected_text (view, EV_ANNOTATION_TEXT_MARKUP_HIGHLIGHT, EV_ANNOTATION_COLOR_YELLOW);
+	ev_view_add_text_markup_annotation_for_selected_text1 (view, EV_ANNOTATION_TEXT_MARKUP_HIGHLIGHT, EV_ANNOTATION_COLOR_YELLOW);
 }
 
 static void
@@ -8056,6 +8081,18 @@ ev_window_get_history (EvWindow *ev_window)
 	priv = GET_PRIVATE (ev_window);
 
 	return priv->history;
+}
+
+EvView *
+ev_window_get_view(EvWindow *ev_window)
+{
+	EvWindowPrivate *priv;
+
+	g_return_val_if_fail(EV_WINDOW(ev_window), NULL);
+
+	priv = GET_PRIVATE(ev_window);
+
+	return EV_VIEW(priv->view);
 }
 
 EvDocumentModel *
