@@ -5230,6 +5230,7 @@ ev_window_cmd_escape (GSimpleAction *action,
 		      GVariant      *parameter,
 		      gpointer       user_data)
 {
+	printf("INSIDE ev_window_cmd_escape\n");
 	EvWindow *window = user_data;
 	EvWindowPrivate *priv = GET_PRIVATE (window);
 
@@ -6108,6 +6109,7 @@ ev_window_change_select_annotation_action_state(GSimpleAction *action,
 												GVariant *state,
 												gpointer user_data)
 {
+	printf("Inside: ev_window_change_select_annotation_action_state\n");
 	EvWindow *ev_window = user_data;
 	EvWindowPrivate *priv = GET_PRIVATE(ev_window);
 	EvToolbar *toolbar;
@@ -6121,6 +6123,14 @@ ev_window_change_select_annotation_action_state(GSimpleAction *action,
 		ev_toolbar_select_annotation_type(toolbar, EV_ANNOTATION_ACTION_TYPE_NOTE);
 	else if (g_str_equal(mode, "highlight"))
 		ev_toolbar_select_annotation_type(toolbar, EV_ANNOTATION_ACTION_TYPE_HIGHLIGHT);
+	else if (g_str_equal(mode, "yellow_highlight"))
+		ev_toolbar_select_annotation_type(toolbar, EV_ANNOTATION_ACTION_TYPE_HIGHLIGHT_YELLOW);
+	else if (g_str_equal(mode, "blue_highlight"))
+		ev_toolbar_select_annotation_type(toolbar, EV_ANNOTATION_ACTION_TYPE_HIGHLIGHT_BLUE);
+	else if (g_str_equal(mode, "pink_highlight"))
+		ev_toolbar_select_annotation_type(toolbar, EV_ANNOTATION_ACTION_TYPE_HIGHLIGHT_PINK);
+	else if (g_str_equal(mode, "green_highlight"))
+		ev_toolbar_select_annotation_type(toolbar, EV_ANNOTATION_ACTION_TYPE_HIGHLIGHT_GREEN);
 	else
 		g_assert_not_reached();
 
@@ -6464,7 +6474,7 @@ static const GActionEntry actions[] = {
 	{"highlight-annotation", NULL, NULL, "false", ev_window_cmd_add_highlight_annotation},
 	{"underline-annotation", NULL, NULL, "false", ev_window_cmd_add_underline_annotation},
 	{"toggle-edit-annots", NULL, NULL, "false", ev_window_cmd_toggle_edit_annots},
-	{"select-annotation", NULL, "s", "'note'", ev_window_change_select_annotation_action_state},
+	{"select-annotation", NULL, "s", "'yellow_highlight'", ev_window_change_select_annotation_action_state},
 	{"about", ev_window_cmd_about},
 	{"help", ev_window_cmd_help},
 	/* Popups specific items */
@@ -6534,6 +6544,8 @@ ev_window_begin_add_annot (EvWindow        *window,
 			   EvAnnotationTextMarkupType annot_markup_type,
 			   EvAnnotationColor	annot_color)
 {
+	printf("INSIDE: ev_window_begin_add_annot()\n");
+
 	EvWindowPrivate *priv = GET_PRIVATE (window);
 
 	//TODO: NEED TO REWORK THIS TO WORK WITH TRANSFERRED CHANGES
@@ -6552,17 +6564,23 @@ view_annot_added (EvView       *view,
 		  EvAnnotation *annot,
 		  EvWindow     *window)
 {
+	printf("INSIDE: view_annot_added()\n");
 	EvWindowPrivate *priv = GET_PRIVATE (window);
 
 	ev_sidebar_annotations_annot_added (EV_SIDEBAR_ANNOTATIONS (priv->sidebar_annots),
 					    annot);
 	ev_annotations_toolbar_add_annot_finished (EV_ANNOTATIONS_TOOLBAR (priv->annots_toolbar));
+
+	ev_toolbar_add_annot_finished(EV_TOOLBAR(priv->toolbar));
+
+	// ev_annotation_action_add_annot_finished(EV_ANNOTATION_ACTION(priv->annots_action));
 }
 
 static void
 view_annot_cancel_add (EvView   *view,
 		       EvWindow *window)
 {
+	printf("INSIDE: view_annot_cancel_add()\n");
 	EvWindowPrivate *priv = GET_PRIVATE (window);
 	ev_annotations_toolbar_add_annot_finished (EV_ANNOTATIONS_TOOLBAR (priv->annots_toolbar));
 }

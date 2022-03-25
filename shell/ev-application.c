@@ -984,9 +984,12 @@ ev_application_startup (GApplication *gapplication)
             "win.rotate-right", "<Ctrl>Right", NULL,
             "win.inverted-colors", "<Ctrl>I", NULL,
 
-            "win.select-annotation::highlight", NULL, NULL,
+            "win.select-annotation::yellow_highlight", NULL, NULL,
+            "win.select-annotation::blue_highlight", NULL, NULL,
+            "win.select-annotation::pink_highlight", NULL, NULL,
+            "win.select-annotation::green_highlight", NULL, NULL,
             "win.select-annotation::note", NULL, NULL,
-            
+
             "win.reload", "<Ctrl>R", NULL,
             "win.add-annotation", "s", NULL,
             "win.highlight-annotation", "<Ctrl>H", NULL,

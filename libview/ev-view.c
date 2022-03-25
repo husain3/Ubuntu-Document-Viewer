@@ -3725,6 +3725,7 @@ ev_view_create_annotation_real (EvView *view,
 				EvPoint start,
 				EvPoint end)
 {
+	printf("INSIDE: ev_view_create_annotation_real()\n");
 	EvAnnotation   *annot;
 	EvRectangle     doc_rect, popup_rect;
 	EvPage         *page;
@@ -3736,7 +3737,7 @@ ev_view_create_annotation_real (EvView *view,
 
 	ev_document_doc_mutex_lock ();
 	page = ev_document_get_page (view->document, annot_page);
-        switch (view->adding_annot_info.type) {
+    switch (view->adding_annot_info.type) {
         case EV_ANNOTATION_TYPE_TEXT:
                 doc_rect.x1 = end.x;
                 doc_rect.y1 = end.y;
@@ -3778,6 +3779,8 @@ ev_view_create_annotation_real (EvView *view,
 	}
 	g_object_unref (page);
 
+	// printf("!!!!!!!!!!!!!CHECKPOINT!!!!!!!!!!!!!\n");
+
 	ev_annotation_set_area (annot, &doc_rect);
 	ev_annotation_set_color (annot, &color);
 
@@ -3818,6 +3821,7 @@ ev_view_create_annotation_real (EvView *view,
 static void
 ev_view_create_annotation (EvView *view)
 {
+	printf("INSIDE: ev_view_create_annotation()\n");
 	EvAnnotation   *annot;
 	EvPoint         start;
 	EvPoint         end;
@@ -4014,6 +4018,7 @@ ev_view_focus_annotation (EvView    *view,
 void ev_view_begin_add_annotation(EvView *view,
 								  EvAnnotationType annot_type)
 {
+	printf("INSIDE ev_view_begin_add_annotation()\n");
 	if (annot_type == EV_ANNOTATION_TYPE_UNKNOWN)
 		return;
 
@@ -4031,6 +4036,8 @@ ev_view_begin_add_annotation1 (EvView          *view,
 			      EvAnnotationTextMarkupType annot_markup_type,
 			      EvAnnotationColor annot_color)
 {
+	printf("INSIDE ev_view_begin_add_annotation1()\n");
+
 	if (annot_type == EV_ANNOTATION_TYPE_UNKNOWN)
 		return;
 
@@ -4048,6 +4055,7 @@ ev_view_begin_add_annotation1 (EvView          *view,
 	/*IF */
 	if((view->motion.x > 0 && view->motion.y > 0) || (view->selection_info.style > 0))
 	{
+		printf("INSIDE IF: view->motion.x: %d view->motion.y: %d view->selection_info.style: %d\n", view->motion.x, view->motion.y, view->selection_info.style);
 		EvRectangle  rect;
 		GtkWindow  *parent;
 		GtkWidget  *window;
@@ -4067,7 +4075,7 @@ ev_view_begin_add_annotation1 (EvView          *view,
 
 		if(view->selection_info.style > 0)
 		{
-
+			printf("INSIDE IF: vview->selection_info.style > 0\n");
 			view->adding_annot_info.start.x = view->annot_selection_start.x;
 			view->adding_annot_info.start.y = view->annot_selection_start.y;
 
@@ -4089,8 +4097,23 @@ ev_view_begin_add_annotation1 (EvView          *view,
 
 		annot_page = ev_annotation_get_page_index (view->adding_annot_info.annot);
 		ev_view_get_page_extents (view, annot_page, &page_area, &border);
-		//g_list_last (view->selection_info.selections);
-		list = view->selection_info.selections->data;
+		
+		printf("################################################\n");
+		printf("################################################\n");
+		printf("################################################\n");
+		printf("################################################\n");
+		if (view->selection_info.selections == NULL)
+		{
+			printf("NULLLLL\n");
+		}
+		printf("################################################\n");
+		printf("################################################\n");
+		printf("################################################\n");
+		printf("################################################\n");
+
+		
+		// g_list_last (view->selection_info.selections);
+		// list = view->selection_info.selections->data;
 
 		ev_annotation_get_area (view->adding_annot_info.annot, &current_area);
 		_ev_view_transform_view_point_to_doc_point (view, &view->adding_annot_info.start, &page_area, &border,
@@ -4146,7 +4169,7 @@ ev_view_begin_add_annotation1 (EvView          *view,
 
 		view->adding_annot_info.adding_annot = FALSE;
 		view->adding_annot_info.annot = NULL;
-		//clear_selection (view);
+		clear_selection (view);
 		return;
 	}
 
@@ -4158,6 +4181,7 @@ ev_view_begin_add_annotation1 (EvView          *view,
 void
 ev_view_cancel_add_annotation (EvView *view)
 {
+	printf("INSIDE: ev_view_cancel_add_annotation()\n");
 	gint x, y;
 	guint annot_page;
 
@@ -5909,6 +5933,7 @@ static gboolean
 ev_view_button_press_event (GtkWidget      *widget,
 			    GdkEventButton *event)
 {
+	printf("INSIDE ev_view_button_press_event()\n");
 	EvView *view = EV_VIEW (widget);
 
 	ev_view_link_preview_popover_cleanup (view);
@@ -6669,6 +6694,7 @@ ev_view_add_text_markup_annotation_for_selected_text1 (EvView  *view,
 									EvAnnotationTextMarkupType annot_markup_type,
 									EvAnnotationColor	annot_color)
 {
+	printf("INSIDE ev_view_add_text_markup_annotation_for_selected_text1()\n");
 	GList *l;
 
 	if (view->adding_annot_info.annot || view->adding_annot_info.adding_annot ||
@@ -6750,6 +6776,7 @@ static gboolean
 ev_view_button_release_event (GtkWidget      *widget,
 			      GdkEventButton *event)
 {
+	printf("INSIDE: ev_view_button_release_event()\n");
 	EvView *view = EV_VIEW (widget);
 	EvLink *link = NULL;
 
@@ -6832,10 +6859,12 @@ ev_view_button_release_event (GtkWidget      *widget,
 			
 		view->adding_annot_info.stop.x = event->x + view->scroll_x;
 		view->adding_annot_info.stop.y = event->y + view->scroll_y;
-		if (annot_added)
-			g_signal_emit (view, signals[SIGNAL_ANNOT_ADDED], 0, view->adding_annot_info.annot);
-		else
-			g_signal_emit (view, signals[SIGNAL_ANNOT_CANCEL_ADD], 0, NULL);
+		if (annot_added) {
+			g_signal_emit(view, signals[SIGNAL_ANNOT_ADDED], 0, view->adding_annot_info.annot);
+			// printf("NO signals[SIGNAL_ANNOT_ADDED]");
+		} else {
+			g_signal_emit(view, signals[SIGNAL_ANNOT_CANCEL_ADD], 0, NULL);
+		}
 
 		view->adding_annot_info.adding_annot = FALSE;
 		view->adding_annot_info.annot = NULL;
@@ -10296,6 +10325,7 @@ static void
 merge_selection_region (EvView *view,
 			GList  *new_list)
 {
+	printf("INSIDE: merge_selection_region: %d, %d\n", view->motion.x, view->motion.y);
 	GList *old_list;
 	GList *new_list_ptr, *old_list_ptr;
 	GtkBorder border;
@@ -10312,6 +10342,8 @@ merge_selection_region (EvView *view,
 
 	compute_border (view, &border);
 	while (new_list_ptr || old_list_ptr) {
+		printf("INSIDE: merge_selection_region ----------- FIRST WHILE\n");
+
 		EvViewSelection *old_sel, *new_sel;
 		int cur_page;
 		cairo_region_t *region = NULL;
@@ -10451,7 +10483,11 @@ selection_free (EvViewSelection *selection)
 static void
 clear_selection (EvView *view)
 {
-	merge_selection_region (view, NULL);
+	merge_selection_region(view, NULL);
+	
+	/*BIGFIX: NEED TO CLEAR*/
+	view->motion.x = 0;
+	view->motion.y = 0;
 }
 
 void

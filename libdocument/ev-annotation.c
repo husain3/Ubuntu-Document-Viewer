@@ -1510,11 +1510,12 @@ ev_annotation_text_markup_markup_iface_init (EvAnnotationMarkupInterface *iface)
 EvAnnotation *
 ev_annotation_text_markup_highlight_new (EvPage *page)
 {
-        EvAnnotation *annot = EV_ANNOTATION (g_object_new (EV_TYPE_ANNOTATION_TEXT_MARKUP,
-                                                           "page", page,
-                                                           "type", EV_ANNOTATION_TEXT_MARKUP_HIGHLIGHT,
-                                                           NULL));
-        return annot;
+	printf("INSIDE ev_annotation_text_markup_highlight_new()\n");
+	EvAnnotation *annot = EV_ANNOTATION(g_object_new(EV_TYPE_ANNOTATION_TEXT_MARKUP,
+							    "page", page,
+							    "type", EV_ANNOTATION_TEXT_MARKUP_HIGHLIGHT,
+							    NULL));
+	return annot;
 }
 
 EvAnnotation *

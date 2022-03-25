@@ -20,6 +20,7 @@
 
 #include "config.h"
 #include "ev-annotation-action.h"
+#include "ev-annotations-marshal.h"
 
 #include <glib/gi18n.h>
 #include <evince-document.h>
@@ -55,28 +56,59 @@ static void
 ev_annotation_action_annot_button_toggled (GtkWidget          *button,
                                            EvAnnotationAction *annotation_action)
 {
+        printf("Inside: ev_annotation_action_annot_button_toggled\n");
         EvAnnotationActionPrivate *priv = GET_PRIVATE (annotation_action);
         EvAnnotationType annot_type;
+        EvAnnotationTextMarkupType annot_markup_type;
+        EvAnnotationColor annot_color;
 
         if (!gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (button))) {
-                g_signal_emit (annotation_action, signals[CANCEL_ADD_ANNOT], 0, NULL);
+                // g_signal_emit (annotation_action, signals[CANCEL_ADD_ANNOT], 0, NULL);
                 return;
         }
 
-	switch (priv->active_annot_type) {
+        printf("active annot type: %d\n", priv->active_annot_type);
+
+        switch (priv->active_annot_type) {
         case EV_ANNOTATION_ACTION_TYPE_NOTE:
                 annot_type = EV_ANNOTATION_TYPE_TEXT;
+                annot_markup_type = EV_ANNOTATION_TEXT_MARKUP_NONE;
+                annot_color = EV_ANNOTATION_COLOR_YELLOW;
                 break;
         case EV_ANNOTATION_ACTION_TYPE_HIGHLIGHT:
                 annot_type = EV_ANNOTATION_TYPE_TEXT_MARKUP;
+                annot_markup_type = EV_ANNOTATION_TEXT_MARKUP_HIGHLIGHT;
+                annot_color = EV_ANNOTATION_COLOR_YELLOW;
+                break;
+        case EV_ANNOTATION_ACTION_TYPE_HIGHLIGHT_YELLOW:
+                annot_type = EV_ANNOTATION_TYPE_TEXT_MARKUP;
+                annot_markup_type = EV_ANNOTATION_TEXT_MARKUP_HIGHLIGHT;
+                annot_color = EV_ANNOTATION_COLOR_YELLOW;
+                break;
+        case EV_ANNOTATION_ACTION_TYPE_HIGHLIGHT_BLUE:
+                annot_type = EV_ANNOTATION_TYPE_TEXT_MARKUP;
+                annot_markup_type = EV_ANNOTATION_TEXT_MARKUP_HIGHLIGHT;
+                annot_color = EV_ANNOTATION_COLOR_CYAN;
+                break;
+        case EV_ANNOTATION_ACTION_TYPE_HIGHLIGHT_PINK:
+                annot_type = EV_ANNOTATION_TYPE_TEXT_MARKUP;
+                annot_markup_type = EV_ANNOTATION_TEXT_MARKUP_HIGHLIGHT;
+                annot_color = EV_ANNOTATION_COLOR_MAGENTA;
+                break;
+        case EV_ANNOTATION_ACTION_TYPE_HIGHLIGHT_GREEN:
+                annot_type = EV_ANNOTATION_TYPE_TEXT_MARKUP;
+                annot_markup_type = EV_ANNOTATION_TEXT_MARKUP_HIGHLIGHT;
+                annot_color = EV_ANNOTATION_COLOR_GREEN;
                 break;
         default:
                 g_assert_not_reached ();
         }
 
-        g_signal_emit (annotation_action, signals[BEGIN_ADD_ANNOT], 0, annot_type);
+        printf("%d %d %d\n", annot_type, annot_markup_type, annot_color);
+        g_signal_emit(annotation_action, signals[BEGIN_ADD_ANNOT], 0, annot_type, annot_markup_type, annot_color);
 }
 
+//THIS FUNCTION CHANGES THE LOGO
 void
 ev_annotation_action_select_annotation (EvAnnotationAction     *annotation_action,
                                         EvAnnotationActionType  annot_type)
@@ -97,7 +129,11 @@ ev_annotation_action_select_annotation (EvAnnotationAction     *annotation_actio
                 tooltip = _("Add text annotation");
 		break;
         case EV_ANNOTATION_ACTION_TYPE_HIGHLIGHT:
-		icon_name = "document-edit-symbolic";
+        case EV_ANNOTATION_ACTION_TYPE_HIGHLIGHT_YELLOW:
+        case EV_ANNOTATION_ACTION_TYPE_HIGHLIGHT_BLUE:
+        case EV_ANNOTATION_ACTION_TYPE_HIGHLIGHT_PINK:
+        case EV_ANNOTATION_ACTION_TYPE_HIGHLIGHT_GREEN:
+                icon_name = "document-edit-symbolic";
                 tooltip = _("Add highlight annotation");
 		break;
         }
@@ -143,15 +179,26 @@ ev_annotation_action_class_init (EvAnnotationActionClass *klass)
                               0, NULL, NULL,
                               g_cclosure_marshal_VOID__VOID,
                               G_TYPE_NONE, 0);
+        // signals[BEGIN_ADD_ANNOT] =
+        //         g_signal_new ("begin-add-annot",
+        //                       G_TYPE_FROM_CLASS (object_class),
+        //                       G_SIGNAL_RUN_LAST,
+        //                       0,
+        //                       NULL, NULL,
+        //                       g_cclosure_marshal_VOID__ENUM,
+        //                       G_TYPE_NONE, 1,
+        //                       EV_TYPE_ANNOTATION_TYPE);
         signals[BEGIN_ADD_ANNOT] =
-                g_signal_new ("begin-add-annot",
-                              G_TYPE_FROM_CLASS (object_class),
-                              G_SIGNAL_RUN_LAST,
-                              0,
-                              NULL, NULL,
-                              g_cclosure_marshal_VOID__ENUM,
-                              G_TYPE_NONE, 1,
-                              EV_TYPE_ANNOTATION_TYPE);
+            g_signal_new("begin-add-annot",
+                         G_TYPE_FROM_CLASS(object_class),
+                         G_SIGNAL_RUN_LAST,
+                         0,
+                         NULL, NULL,
+                         g_cclosure_user_marshal_VOID__ENUM_ENUM_ENUM,
+                         G_TYPE_NONE, 3,
+                         EV_TYPE_ANNOTATION_TYPE,
+                         EV_TYPE_ANNOTATION_TEXT_MARKUP_TYPE,
+                         EV_TYPE_ANNOTATION_COLOR);
         signals[CANCEL_ADD_ANNOT] =
                 g_signal_new ("cancel-add-annot",
                               G_TYPE_FROM_CLASS (object_class),
@@ -184,9 +231,12 @@ ev_annotation_action_init (EvAnnotationAction *annotation_action)
         gtk_style_context_add_class (style_context, GTK_STYLE_CLASS_RAISED);
         gtk_style_context_add_class (style_context, GTK_STYLE_CLASS_LINKED);
 
+
+
+
         button = gtk_toggle_button_new ();
-        image = gtk_image_new_from_icon_name ("user-invisible-symbolic",
-                                              GTK_ICON_SIZE_MENU);
+        image = gtk_image_new_from_icon_name("document-edit-symbolic",
+                                             GTK_ICON_SIZE_MENU);
         gtk_widget_set_valign (button, GTK_ALIGN_CENTER);
         gtk_button_set_image (GTK_BUTTON (button), image);
         g_signal_connect (button, "toggled",
@@ -196,6 +246,8 @@ ev_annotation_action_init (EvAnnotationAction *annotation_action)
         gtk_box_pack_start (GTK_BOX (annotation_action), priv->annot_button,
                             FALSE, FALSE, 0);
         gtk_widget_show (priv->annot_button);
+
+
 
         button = gtk_menu_button_new ();
         gtk_widget_set_valign (button, GTK_ALIGN_CENTER);
@@ -209,7 +261,12 @@ ev_annotation_action_init (EvAnnotationAction *annotation_action)
         gtk_box_pack_start (GTK_BOX (annotation_action), button,
                             FALSE, FALSE, 0);
         priv->annot_menu = button;
-        priv->active_annot_type = EV_ANNOTATION_ACTION_TYPE_HIGHLIGHT;
+        
+        
+        /*GET LAST USED ANNOTATION*/
+        priv->active_annot_type = EV_ANNOTATION_ACTION_TYPE_HIGHLIGHT_YELLOW;
+
+        
         menu = G_MENU_MODEL (gtk_builder_get_object (builder, "annotation-menu"));
         gtk_menu_button_set_menu_model (GTK_MENU_BUTTON (button), menu);
         popup = gtk_menu_button_get_popover (GTK_MENU_BUTTON (button));
@@ -226,3 +283,36 @@ ev_annotation_action_new (void)
                                          NULL));
 }
 
+static gboolean
+ev_annotations_action_toggle_button_if_active(EvAnnotationAction *annotation_action,
+											   GtkToggleButton *button)
+{
+	if (!gtk_toggle_button_get_active(button))
+		return FALSE;
+
+	g_signal_handlers_block_by_func(button,
+									ev_annotation_action_annot_button_toggled,
+									annotation_action);
+	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(button), FALSE);
+	g_signal_handlers_unblock_by_func(button,
+									ev_annotation_action_annot_button_toggled,
+									annotation_action);
+
+	return TRUE;
+}
+
+void 
+ev_annotation_action_add_annot_finished(EvAnnotationAction *annotation_action)
+{
+	g_return_if_fail(EV_IS_ANNOTATION_ACTION(annotation_action));
+
+	printf("INSIDE: ev_annotation_action_add_annot_finished()\n");
+	EvAnnotationActionPrivate *priv = GET_PRIVATE(annotation_action);
+
+	if (ev_annotations_action_toggle_button_if_active(annotation_action, GTK_TOGGLE_BUTTON(priv->annot_button)))
+	{
+		return;
+	}
+
+	ev_annotations_action_toggle_button_if_active(annotation_action, GTK_TOGGLE_BUTTON(priv->annot_button));
+}

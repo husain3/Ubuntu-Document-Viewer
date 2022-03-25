@@ -45,9 +45,15 @@ struct _EvAnnotationActionClass {
         GtkBoxClass parent_class;
 };
 
-typedef enum {
-        EV_ANNOTATION_ACTION_TYPE_NOTE,
-        EV_ANNOTATION_ACTION_TYPE_HIGHLIGHT
+typedef enum
+{
+        EV_ANNOTATION_ACTION_TYPE_HIGHLIGHT,
+        EV_ANNOTATION_ACTION_TYPE_HIGHLIGHT_YELLOW,
+        EV_ANNOTATION_ACTION_TYPE_HIGHLIGHT_BLUE,
+        EV_ANNOTATION_ACTION_TYPE_HIGHLIGHT_PINK,
+        EV_ANNOTATION_ACTION_TYPE_HIGHLIGHT_GREEN,
+        EV_ANNOTATION_ACTION_TYPE_NOTE
+
 } EvAnnotationActionType;
 
 GType      ev_annotation_action_get_type        (void);
@@ -55,6 +61,8 @@ GType      ev_annotation_action_get_type        (void);
 GtkWidget *ev_annotation_action_new             (void);
 void       ev_annotation_action_select_annotation (EvAnnotationAction     *annotation_action,
                                                    EvAnnotationActionType  annot_type);
+
+void       ev_annotation_action_add_annot_finished(EvAnnotationAction *annotation_action);
 G_END_DECLS
 
 #endif

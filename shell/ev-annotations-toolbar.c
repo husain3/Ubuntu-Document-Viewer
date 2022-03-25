@@ -360,8 +360,9 @@ ev_annotations_toolbar_add_annot_finished (EvAnnotationsToolbar *toolbar)
 {
         g_return_if_fail (EV_IS_ANNOTATIONS_TOOLBAR (toolbar));
 
-        if (ev_annotations_toolbar_toggle_button_if_active (toolbar, GTK_TOGGLE_TOOL_BUTTON (toolbar->text_button)))
-                return;
+        if (ev_annotations_toolbar_toggle_button_if_active (toolbar, GTK_TOGGLE_TOOL_BUTTON (toolbar->text_button))) {
+			return;
+		}
 
         ev_annotations_toolbar_toggle_button_if_active (toolbar, GTK_TOGGLE_TOOL_BUTTON (toolbar->highlight_button_yellow));
         ev_annotations_toolbar_toggle_button_if_active (toolbar, GTK_TOGGLE_TOOL_BUTTON (toolbar->highlight_button_cyan));
@@ -369,4 +370,5 @@ ev_annotations_toolbar_add_annot_finished (EvAnnotationsToolbar *toolbar)
         ev_annotations_toolbar_toggle_button_if_active (toolbar, GTK_TOGGLE_TOOL_BUTTON (toolbar->highlight_button_magenta));
         ev_annotations_toolbar_toggle_button_if_active (toolbar, GTK_TOGGLE_TOOL_BUTTON (toolbar->underline_button));
         ev_annotations_toolbar_toggle_button_if_active (toolbar, GTK_TOGGLE_TOOL_BUTTON (toolbar->strikethrough_button));
-        ev_annotations_toolbar_toggle_button_if_active (toolbar, GTK_TOGGLE_TOOL_BUTTON (toolbar->squiggly_button));}
+        ev_annotations_toolbar_toggle_button_if_active (toolbar, GTK_TOGGLE_TOOL_BUTTON (toolbar->squiggly_button));
+}

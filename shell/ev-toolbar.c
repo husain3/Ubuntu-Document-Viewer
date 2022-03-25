@@ -166,19 +166,39 @@ zoom_selector_activated (GtkWidget *zoom_action,
 
 static void
 ev_toolbar_begin_add_annot(EvToolbar *ev_toolbar,
-                           EvAnnotationType annot_type)
+                           EvAnnotationType annot_type,
+                           EvAnnotationTextMarkupType annot_markup_type,
+                           EvAnnotationColor annot_color)
 {
+        printf("INSIDE ev_toolbar_begin_add_annot()\n");
         EvToolbarPrivate *priv = GET_PRIVATE(ev_toolbar);
         EvView *view = ev_window_get_view(priv->window);
 
         if (annot_type == EV_ANNOTATION_TYPE_TEXT_MARKUP &&
             ev_view_get_has_selection(view))
         {
-                ev_view_add_text_markup_annotation_for_selected_text(view);
+                ev_view_add_text_markup_annotation_for_selected_text1(view, annot_markup_type, annot_color);
+                // gtk_toggle_button_toggled(GTK_TOGGLE_BUTTON(priv->annots_button));
                 return;
         }
 
-        ev_view_begin_add_annotation(view, annot_type);
+        ev_view_begin_add_annotation1(view, annot_type,  annot_markup_type, annot_color);
+}
+
+// static gboolean
+// ev_annotations_toolbar_toggle_button_if_active(EvAnnotationsToolbar *toolbar,
+//                                                GtkToggleToolButton *button)
+// {
+
+// }
+
+void 
+ev_toolbar_add_annot_finished(EvToolbar *ev_toolbar)
+{
+        printf("INSIDE: ev_toolbar_add_annot_finished()\n");
+        EvToolbarPrivate *priv = GET_PRIVATE(ev_toolbar);
+        ev_annotation_action_add_annot_finished(EV_ANNOTATION_ACTION(priv->annots_action));
+        //EV_ANNOTATION_ACTION(priv->annots_action)
 }
 
 static void
