@@ -466,7 +466,7 @@ ev_toolbar_set_mode (EvToolbar     *ev_toolbar,
                 gtk_widget_show (priv->page_selector);
                 gtk_widget_show (priv->find_button);
                 gtk_widget_show (priv->annots_action);
-                gtk_widget_show (priv->annots_button);
+                // gtk_widget_show (priv->annots_button);
                 gtk_widget_hide (priv->open_button);
                 break;
 	case EV_TOOLBAR_MODE_RECENT_VIEW:
@@ -476,7 +476,7 @@ ev_toolbar_set_mode (EvToolbar     *ev_toolbar,
                 gtk_widget_hide (priv->page_selector);
                 gtk_widget_hide (priv->find_button);
                 gtk_widget_hide(priv->annots_action);
-                gtk_widget_hide (priv->annots_button);
+                // gtk_widget_hide (priv->annots_button);
                 gtk_widget_show (priv->open_button);
                 break;
         }

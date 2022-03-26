@@ -988,6 +988,9 @@ ev_application_startup (GApplication *gapplication)
             "win.select-annotation::blue_highlight", NULL, NULL,
             "win.select-annotation::pink_highlight", NULL, NULL,
             "win.select-annotation::green_highlight", NULL, NULL,
+        "win.select-annotation::underline", NULL, NULL,
+            "win.select-annotation::strikethrough", NULL, NULL,
+            "win.select-annotation::squiggly", NULL, NULL,
             "win.select-annotation::note", NULL, NULL,
 
             "win.reload", "<Ctrl>R", NULL,

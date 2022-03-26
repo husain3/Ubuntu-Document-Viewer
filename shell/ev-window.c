@@ -6132,6 +6132,12 @@ ev_window_change_select_annotation_action_state(GSimpleAction *action,
 		ev_toolbar_select_annotation_type(toolbar, EV_ANNOTATION_ACTION_TYPE_HIGHLIGHT_PINK);
 	else if (g_str_equal(mode, "green_highlight"))
 		ev_toolbar_select_annotation_type(toolbar, EV_ANNOTATION_ACTION_TYPE_HIGHLIGHT_GREEN);
+	else if (g_str_equal(mode, "underline"))
+		ev_toolbar_select_annotation_type(toolbar, EV_ANNOTATION_ACTION_TYPE_UNDERLINE);
+	else if (g_str_equal(mode, "strikethrough"))
+		ev_toolbar_select_annotation_type(toolbar, EV_ANNOTATION_ACTION_TYPE_STRIKE_OUT);
+	else if (g_str_equal(mode, "squiggly"))
+		ev_toolbar_select_annotation_type(toolbar, EV_ANNOTATION_ACTION_TYPE_SQUIGGLY);
 	else
 		g_assert_not_reached();
 

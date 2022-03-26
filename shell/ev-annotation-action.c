@@ -98,6 +98,21 @@ ev_annotation_action_switch_annot_settings(EvAnnotationAction *annotation_action
                 *annot_markup_type = EV_ANNOTATION_TEXT_MARKUP_HIGHLIGHT;
                 *annot_color = EV_ANNOTATION_COLOR_GREEN;
                 break;
+        case EV_ANNOTATION_ACTION_TYPE_UNDERLINE:
+                *annot_type = EV_ANNOTATION_TYPE_TEXT_MARKUP;
+                *annot_markup_type = EV_ANNOTATION_TEXT_MARKUP_UNDERLINE;
+                *annot_color = EV_ANNOTATION_COLOR_NONE;
+                break;
+        case EV_ANNOTATION_ACTION_TYPE_STRIKE_OUT:
+                *annot_type = EV_ANNOTATION_TYPE_TEXT_MARKUP;
+                *annot_markup_type = EV_ANNOTATION_TEXT_MARKUP_STRIKE_OUT;
+                *annot_color = EV_ANNOTATION_COLOR_NONE;
+                break;
+        case EV_ANNOTATION_ACTION_TYPE_SQUIGGLY:
+                *annot_type = EV_ANNOTATION_TYPE_TEXT_MARKUP;
+                *annot_markup_type = EV_ANNOTATION_TEXT_MARKUP_SQUIGGLY;
+                *annot_color = EV_ANNOTATION_COLOR_NONE;
+                break;
         default:
                 g_assert_not_reached();
         }
@@ -141,18 +156,22 @@ ev_annotation_action_select_annotation (EvAnnotationAction     *annotation_actio
         priv->active_annot_type = annot_type;
 	switch (annot_type) {
         case EV_ANNOTATION_ACTION_TYPE_NOTE:
-		icon_name = "user-invisible-symbolic";
-                tooltip = _("Add text annotation");
+		icon_name = "user-available-symbolic";
+                tooltip = _("Add note");
 		break;
         case EV_ANNOTATION_ACTION_TYPE_HIGHLIGHT:
         case EV_ANNOTATION_ACTION_TYPE_HIGHLIGHT_YELLOW:
         case EV_ANNOTATION_ACTION_TYPE_HIGHLIGHT_BLUE:
         case EV_ANNOTATION_ACTION_TYPE_HIGHLIGHT_PINK:
         case EV_ANNOTATION_ACTION_TYPE_HIGHLIGHT_GREEN:
+        case EV_ANNOTATION_ACTION_TYPE_STRIKE_OUT:
+        case EV_ANNOTATION_ACTION_TYPE_UNDERLINE:
+        case EV_ANNOTATION_ACTION_TYPE_SQUIGGLY:
                 icon_name = "document-edit-symbolic";
                 tooltip = _("Add highlight annotation");
 		break;
         }
+
         image = gtk_image_new_from_icon_name (icon_name,
                                               GTK_ICON_SIZE_MENU);
         gtk_button_set_image (GTK_BUTTON (priv->annot_button), image);
