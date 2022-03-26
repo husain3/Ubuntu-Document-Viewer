@@ -50,14 +50,64 @@ G_DEFINE_TYPE_WITH_PRIVATE (EvAnnotationAction, ev_annotation_action, GTK_TYPE_B
 
 #define GET_PRIVATE(o) ev_annotation_action_get_instance_private (o)
 
-static guint signals[LAST_SIGNAL] = { 0 };
+static gboolean
+ev_annotations_action_toggle_button_if_inactive(EvAnnotationAction *annotation_action,
+                                                GtkToggleButton *button);
+
+static gboolean
+ev_annotations_action_toggle_button_if_active(EvAnnotationAction *annotation_action,
+                                                GtkToggleButton *button);
+
+static guint signals[LAST_SIGNAL] = {0};
+
+static void
+ev_annotation_action_switch_annot_settings(EvAnnotationAction *annotation_action, EvAnnotationType *annot_type, EvAnnotationTextMarkupType *annot_markup_type, EvAnnotationColor *annot_color)
+{
+        printf("Inside: ev_annotation_action_switch_annot_settings\n");
+        EvAnnotationActionPrivate *priv = GET_PRIVATE(annotation_action);
+        printf("active annot type: %d\n", priv->active_annot_type);
+        switch (priv->active_annot_type)
+        {
+        case EV_ANNOTATION_ACTION_TYPE_NOTE:
+                *annot_type = EV_ANNOTATION_TYPE_TEXT;
+                *annot_markup_type = EV_ANNOTATION_TEXT_MARKUP_NONE;
+                *annot_color = EV_ANNOTATION_COLOR_YELLOW;
+                break;
+        case EV_ANNOTATION_ACTION_TYPE_HIGHLIGHT:
+                *annot_type = EV_ANNOTATION_TYPE_TEXT_MARKUP;
+                *annot_markup_type = EV_ANNOTATION_TEXT_MARKUP_HIGHLIGHT;
+                *annot_color = EV_ANNOTATION_COLOR_YELLOW;
+                break;
+        case EV_ANNOTATION_ACTION_TYPE_HIGHLIGHT_YELLOW:
+                *annot_type = EV_ANNOTATION_TYPE_TEXT_MARKUP;
+                *annot_markup_type = EV_ANNOTATION_TEXT_MARKUP_HIGHLIGHT;
+                *annot_color = EV_ANNOTATION_COLOR_YELLOW;
+                break;
+        case EV_ANNOTATION_ACTION_TYPE_HIGHLIGHT_BLUE:
+                *annot_type = EV_ANNOTATION_TYPE_TEXT_MARKUP;
+                *annot_markup_type = EV_ANNOTATION_TEXT_MARKUP_HIGHLIGHT;
+                *annot_color = EV_ANNOTATION_COLOR_CYAN;
+                break;
+        case EV_ANNOTATION_ACTION_TYPE_HIGHLIGHT_PINK:
+                *annot_type = EV_ANNOTATION_TYPE_TEXT_MARKUP;
+                *annot_markup_type = EV_ANNOTATION_TEXT_MARKUP_HIGHLIGHT;
+                *annot_color = EV_ANNOTATION_COLOR_MAGENTA;
+                break;
+        case EV_ANNOTATION_ACTION_TYPE_HIGHLIGHT_GREEN:
+                *annot_type = EV_ANNOTATION_TYPE_TEXT_MARKUP;
+                *annot_markup_type = EV_ANNOTATION_TEXT_MARKUP_HIGHLIGHT;
+                *annot_color = EV_ANNOTATION_COLOR_GREEN;
+                break;
+        default:
+                g_assert_not_reached();
+        }
+}
 
 static void
 ev_annotation_action_annot_button_toggled (GtkWidget          *button,
                                            EvAnnotationAction *annotation_action)
 {
         printf("Inside: ev_annotation_action_annot_button_toggled\n");
-        EvAnnotationActionPrivate *priv = GET_PRIVATE (annotation_action);
         EvAnnotationType annot_type;
         EvAnnotationTextMarkupType annot_markup_type;
         EvAnnotationColor annot_color;
@@ -67,42 +117,7 @@ ev_annotation_action_annot_button_toggled (GtkWidget          *button,
                 return;
         }
 
-        printf("active annot type: %d\n", priv->active_annot_type);
-
-        switch (priv->active_annot_type) {
-        case EV_ANNOTATION_ACTION_TYPE_NOTE:
-                annot_type = EV_ANNOTATION_TYPE_TEXT;
-                annot_markup_type = EV_ANNOTATION_TEXT_MARKUP_NONE;
-                annot_color = EV_ANNOTATION_COLOR_YELLOW;
-                break;
-        case EV_ANNOTATION_ACTION_TYPE_HIGHLIGHT:
-                annot_type = EV_ANNOTATION_TYPE_TEXT_MARKUP;
-                annot_markup_type = EV_ANNOTATION_TEXT_MARKUP_HIGHLIGHT;
-                annot_color = EV_ANNOTATION_COLOR_YELLOW;
-                break;
-        case EV_ANNOTATION_ACTION_TYPE_HIGHLIGHT_YELLOW:
-                annot_type = EV_ANNOTATION_TYPE_TEXT_MARKUP;
-                annot_markup_type = EV_ANNOTATION_TEXT_MARKUP_HIGHLIGHT;
-                annot_color = EV_ANNOTATION_COLOR_YELLOW;
-                break;
-        case EV_ANNOTATION_ACTION_TYPE_HIGHLIGHT_BLUE:
-                annot_type = EV_ANNOTATION_TYPE_TEXT_MARKUP;
-                annot_markup_type = EV_ANNOTATION_TEXT_MARKUP_HIGHLIGHT;
-                annot_color = EV_ANNOTATION_COLOR_CYAN;
-                break;
-        case EV_ANNOTATION_ACTION_TYPE_HIGHLIGHT_PINK:
-                annot_type = EV_ANNOTATION_TYPE_TEXT_MARKUP;
-                annot_markup_type = EV_ANNOTATION_TEXT_MARKUP_HIGHLIGHT;
-                annot_color = EV_ANNOTATION_COLOR_MAGENTA;
-                break;
-        case EV_ANNOTATION_ACTION_TYPE_HIGHLIGHT_GREEN:
-                annot_type = EV_ANNOTATION_TYPE_TEXT_MARKUP;
-                annot_markup_type = EV_ANNOTATION_TEXT_MARKUP_HIGHLIGHT;
-                annot_color = EV_ANNOTATION_COLOR_GREEN;
-                break;
-        default:
-                g_assert_not_reached ();
-        }
+        ev_annotation_action_switch_annot_settings(annotation_action, &annot_type, &annot_markup_type, &annot_color);
 
         printf("%d %d %d\n", annot_type, annot_markup_type, annot_color);
         g_signal_emit(annotation_action, signals[BEGIN_ADD_ANNOT], 0, annot_type, annot_markup_type, annot_color);
@@ -113,6 +128,7 @@ void
 ev_annotation_action_select_annotation (EvAnnotationAction     *annotation_action,
                                         EvAnnotationActionType  annot_type)
 {
+        printf("INSIDE: ev_annotation_action_select_annotation()\n");
         EvAnnotationActionPrivate *priv;
         const gchar *icon_name = NULL;
         const gchar *tooltip = NULL;
@@ -143,6 +159,21 @@ ev_annotation_action_select_annotation (EvAnnotationAction     *annotation_actio
         gtk_widget_set_tooltip_text (priv->annot_button, tooltip);
 
         g_signal_emit (annotation_action, signals[ACTIVATED], 0, NULL);
+
+        EvAnnotationType new_annot_type;
+        EvAnnotationTextMarkupType annot_markup_type;
+        EvAnnotationColor annot_color;
+
+        ev_annotation_action_switch_annot_settings(annotation_action, &new_annot_type, &annot_markup_type, &annot_color);
+
+        printf("%d %d %d\n", new_annot_type, annot_markup_type, annot_color);
+        g_signal_emit(annotation_action, signals[CANCEL_ADD_ANNOT], 0, NULL);
+
+
+        ev_annotations_action_toggle_button_if_inactive(annotation_action, GTK_TOGGLE_BUTTON(priv->annot_button));
+
+
+        g_signal_emit(annotation_action, signals[BEGIN_ADD_ANNOT], 0, new_annot_type, annot_markup_type, annot_color);
 }
 
 static void
@@ -179,15 +210,6 @@ ev_annotation_action_class_init (EvAnnotationActionClass *klass)
                               0, NULL, NULL,
                               g_cclosure_marshal_VOID__VOID,
                               G_TYPE_NONE, 0);
-        // signals[BEGIN_ADD_ANNOT] =
-        //         g_signal_new ("begin-add-annot",
-        //                       G_TYPE_FROM_CLASS (object_class),
-        //                       G_SIGNAL_RUN_LAST,
-        //                       0,
-        //                       NULL, NULL,
-        //                       g_cclosure_marshal_VOID__ENUM,
-        //                       G_TYPE_NONE, 1,
-        //                       EV_TYPE_ANNOTATION_TYPE);
         signals[BEGIN_ADD_ANNOT] =
             g_signal_new("begin-add-annot",
                          G_TYPE_FROM_CLASS(object_class),
@@ -284,35 +306,53 @@ ev_annotation_action_new (void)
 }
 
 static gboolean
-ev_annotations_action_toggle_button_if_active(EvAnnotationAction *annotation_action,
-											   GtkToggleButton *button)
+ev_annotations_action_toggle_button_if_inactive(EvAnnotationAction *annotation_action,
+                                              GtkToggleButton *button)
 {
-	if (!gtk_toggle_button_get_active(button))
-		return FALSE;
+        if (gtk_toggle_button_get_active(button))
+                return FALSE;
+        
+        g_signal_handlers_block_by_func(button,
+                                        ev_annotation_action_annot_button_toggled,
+                                        annotation_action);
+        gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(button), TRUE);
+        g_signal_handlers_unblock_by_func(button,
+                                          ev_annotation_action_annot_button_toggled,
+                                          annotation_action);
 
-	g_signal_handlers_block_by_func(button,
-									ev_annotation_action_annot_button_toggled,
-									annotation_action);
-	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(button), FALSE);
-	g_signal_handlers_unblock_by_func(button,
-									ev_annotation_action_annot_button_toggled,
-									annotation_action);
-
-	return TRUE;
+        return TRUE;
 }
 
-void 
-ev_annotation_action_add_annot_finished(EvAnnotationAction *annotation_action)
+static gboolean
+ev_annotations_action_toggle_button_if_active(EvAnnotationAction * annotation_action,
+                                                GtkToggleButton * button)
 {
-	g_return_if_fail(EV_IS_ANNOTATION_ACTION(annotation_action));
+        if (!gtk_toggle_button_get_active(button))
+                return FALSE;
 
-	printf("INSIDE: ev_annotation_action_add_annot_finished()\n");
-	EvAnnotationActionPrivate *priv = GET_PRIVATE(annotation_action);
+        g_signal_handlers_block_by_func(button,
+                                        ev_annotation_action_annot_button_toggled,
+                                        annotation_action);
+        gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(button), FALSE);
+        g_signal_handlers_unblock_by_func(button,
+                                                ev_annotation_action_annot_button_toggled,
+                                                annotation_action);
 
-	if (ev_annotations_action_toggle_button_if_active(annotation_action, GTK_TOGGLE_BUTTON(priv->annot_button)))
-	{
-		return;
-	}
+        return TRUE;
+}
 
-	ev_annotations_action_toggle_button_if_active(annotation_action, GTK_TOGGLE_BUTTON(priv->annot_button));
+void
+ev_annotation_action_add_annot_finished(EvAnnotationAction * annotation_action)
+{
+        g_return_if_fail(EV_IS_ANNOTATION_ACTION(annotation_action));
+
+        printf("INSIDE: ev_annotation_action_add_annot_finished()\n");
+        EvAnnotationActionPrivate *priv = GET_PRIVATE(annotation_action);
+
+        if (ev_annotations_action_toggle_button_if_active(annotation_action, GTK_TOGGLE_BUTTON(priv->annot_button)))
+        {
+                return;
+        }
+
+        ev_annotations_action_toggle_button_if_active(annotation_action, GTK_TOGGLE_BUTTON(priv->annot_button));
 }
