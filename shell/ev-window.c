@@ -6064,6 +6064,8 @@ ev_window_cmd_add_highlight_annotation (GSimpleAction *action,
                                         GVariant      *state,
                                         gpointer       user_data)
 {
+	printf("INSIDE: ev_window_cmd_add_highlight_annotation\n");
+
 	EvWindow *ev_window = user_data;
 
 	ev_window_begin_add_annot (ev_window, EV_ANNOTATION_TYPE_TEXT_MARKUP, EV_ANNOTATION_TEXT_MARKUP_HIGHLIGHT, EV_ANNOTATION_COLOR_YELLOW);
@@ -6074,6 +6076,7 @@ ev_window_cmd_add_underline_annotation (GSimpleAction *action,
                                         GVariant      *state,
                                         gpointer       user_data)
 {
+	printf("INSIDE: ev_window_cmd_add_underline_annotation\n");
 	EvWindow *ev_window = user_data;
 
 	ev_window_begin_add_annot (ev_window, EV_ANNOTATION_TYPE_TEXT_MARKUP, EV_ANNOTATION_TEXT_MARKUP_UNDERLINE, EV_ANNOTATION_COLOR_NONE);
@@ -6110,7 +6113,6 @@ ev_window_change_select_annotation_action_state(GSimpleAction *action,
 												GVariant *state,
 												gpointer user_data)
 {
-	printf("Inside: ev_window_change_select_annotation_action_state\n");
 	EvWindow *ev_window = user_data;
 	EvWindowPrivate *priv = GET_PRIVATE(ev_window);
 	EvToolbar *toolbar;
@@ -6119,6 +6121,7 @@ ev_window_change_select_annotation_action_state(GSimpleAction *action,
 	toolbar = priv->toolbar ? EV_TOOLBAR(priv->toolbar) : EV_TOOLBAR(priv->toolbar);
 
 	mode = g_variant_get_string(state, NULL);
+	printf("Inside: ev_window_change_select_annotation_action_state: %s\n", mode);
 
 	if (g_str_equal(mode, "note"))
 		ev_toolbar_select_annotation_type(toolbar, EV_ANNOTATION_ACTION_TYPE_NOTE);
@@ -6478,7 +6481,6 @@ static const GActionEntry actions[] = {
 	{"toggle-menu", ev_window_cmd_action_menu},
 	{"caret-navigation", NULL, NULL, "false", ev_window_cmd_view_toggle_caret_navigation},
 	{"add-annotation", NULL, NULL, "false", ev_window_cmd_add_annotation},
-	{"highlight-annotation", NULL, NULL, "false", ev_window_cmd_add_highlight_annotation},
 	{"underline-annotation", NULL, NULL, "false", ev_window_cmd_add_underline_annotation},
 	{"toggle-edit-annots", NULL, NULL, "false", ev_window_cmd_toggle_edit_annots},
 	{"select-annotation", NULL, "s", "'yellow_highlight'", ev_window_change_select_annotation_action_state},

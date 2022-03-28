@@ -43,6 +43,7 @@ typedef struct {
         GtkWidget       *annot_button;
         GtkWidget       *annot_menu;
 
+        EvAnnotationActionType last_used_highlight_color;
         EvAnnotationActionType active_annot_type;
 } EvAnnotationActionPrivate;
 
@@ -65,7 +66,7 @@ ev_annotation_action_switch_annot_settings(EvAnnotationAction *annotation_action
 {
         printf("Inside: ev_annotation_action_switch_annot_settings\n");
         EvAnnotationActionPrivate *priv = GET_PRIVATE(annotation_action);
-        printf("active annot type: %d\n", priv->active_annot_type);
+        // printf("priv->active_annot_type: %d\n", priv->active_annot_type);
         switch (priv->active_annot_type)
         {
         case EV_ANNOTATION_ACTION_TYPE_NOTE:
@@ -82,21 +83,25 @@ ev_annotation_action_switch_annot_settings(EvAnnotationAction *annotation_action
                 *annot_type = EV_ANNOTATION_TYPE_TEXT_MARKUP;
                 *annot_markup_type = EV_ANNOTATION_TEXT_MARKUP_HIGHLIGHT;
                 *annot_color = EV_ANNOTATION_COLOR_YELLOW;
+                priv->last_used_highlight_color = EV_ANNOTATION_ACTION_TYPE_HIGHLIGHT_YELLOW;
                 break;
         case EV_ANNOTATION_ACTION_TYPE_HIGHLIGHT_BLUE:
                 *annot_type = EV_ANNOTATION_TYPE_TEXT_MARKUP;
                 *annot_markup_type = EV_ANNOTATION_TEXT_MARKUP_HIGHLIGHT;
                 *annot_color = EV_ANNOTATION_COLOR_CYAN;
+                priv->last_used_highlight_color = EV_ANNOTATION_ACTION_TYPE_HIGHLIGHT_BLUE;
                 break;
         case EV_ANNOTATION_ACTION_TYPE_HIGHLIGHT_PINK:
                 *annot_type = EV_ANNOTATION_TYPE_TEXT_MARKUP;
                 *annot_markup_type = EV_ANNOTATION_TEXT_MARKUP_HIGHLIGHT;
                 *annot_color = EV_ANNOTATION_COLOR_MAGENTA;
+                priv->last_used_highlight_color = EV_ANNOTATION_ACTION_TYPE_HIGHLIGHT_PINK;
                 break;
         case EV_ANNOTATION_ACTION_TYPE_HIGHLIGHT_GREEN:
                 *annot_type = EV_ANNOTATION_TYPE_TEXT_MARKUP;
                 *annot_markup_type = EV_ANNOTATION_TEXT_MARKUP_HIGHLIGHT;
                 *annot_color = EV_ANNOTATION_COLOR_GREEN;
+                priv->last_used_highlight_color = EV_ANNOTATION_ACTION_TYPE_HIGHLIGHT_GREEN;
                 break;
         case EV_ANNOTATION_ACTION_TYPE_UNDERLINE:
                 *annot_type = EV_ANNOTATION_TYPE_TEXT_MARKUP;
@@ -153,10 +158,17 @@ ev_annotation_action_select_annotation (EvAnnotationAction     *annotation_actio
 
         priv = GET_PRIVATE (annotation_action);
 
-        priv->active_annot_type = annot_type;
+
+        if (annot_type == EV_ANNOTATION_ACTION_TYPE_HIGHLIGHT)
+        {
+                priv->active_annot_type = priv->last_used_highlight_color;
+        } else {
+                priv->active_annot_type = annot_type;
+        }
+
 	switch (annot_type) {
         case EV_ANNOTATION_ACTION_TYPE_NOTE:
-		icon_name = "user-available-symbolic";
+                icon_name = "user-available-symbolic";
                 tooltip = _("Add note");
 		break;
         case EV_ANNOTATION_ACTION_TYPE_HIGHLIGHT:
@@ -305,6 +317,7 @@ ev_annotation_action_init (EvAnnotationAction *annotation_action)
         
         
         /*GET LAST USED ANNOTATION*/
+        priv->last_used_highlight_color = EV_ANNOTATION_ACTION_TYPE_HIGHLIGHT_YELLOW;
         priv->active_annot_type = EV_ANNOTATION_ACTION_TYPE_HIGHLIGHT_YELLOW;
 
         

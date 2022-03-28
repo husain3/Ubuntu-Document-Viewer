@@ -983,20 +983,19 @@ ev_application_startup (GApplication *gapplication)
             "win.rotate-left", "<Ctrl>Left", NULL,
             "win.rotate-right", "<Ctrl>Right", NULL,
             "win.inverted-colors", "<Ctrl>I", NULL,
-
+            "win.select-annotation::underline", "<Ctrl>U", NULL,
+            "win.select-annotation::highlight", "<Ctrl>H", NULL,
             "win.select-annotation::yellow_highlight", NULL, NULL,
             "win.select-annotation::blue_highlight", NULL, NULL,
             "win.select-annotation::pink_highlight", NULL, NULL,
             "win.select-annotation::green_highlight", NULL, NULL,
-        "win.select-annotation::underline", NULL, NULL,
             "win.select-annotation::strikethrough", NULL, NULL,
             "win.select-annotation::squiggly", NULL, NULL,
             "win.select-annotation::note", NULL, NULL,
 
             "win.reload", "<Ctrl>R", NULL,
             "win.add-annotation", "s", NULL,
-            "win.highlight-annotation", "<Ctrl>H", NULL,
-            "win.underline-annotation", "<Ctrl>U", NULL,
+            
             "win.help", "F1", NULL,
             "win.about", NULL, NULL,
             NULL};

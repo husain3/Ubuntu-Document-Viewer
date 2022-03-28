@@ -4175,7 +4175,6 @@ ev_view_begin_add_annotation1 (EvView          *view,
 
 	view->adding_annot_info.text_preselected = 0;
 
-	ev_view_set_cursor (view, EV_VIEW_CURSOR_ADD);
 }
 
 void
