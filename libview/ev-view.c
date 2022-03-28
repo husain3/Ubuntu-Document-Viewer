@@ -3969,7 +3969,7 @@ ev_view_annotation_color(EvView  *view)
 		{
 			/*POSSIBLE FEATURE: MULTIPLE UNDERLINE COLORS?*/
 			color.pixel = 0;
-			color.red = 0;
+			color.red = 65535;
 			color.green = 0;
 			color.blue = 0;
 			return color;
@@ -3978,7 +3978,7 @@ ev_view_annotation_color(EvView  *view)
 		{
 			/*POSSIBLE FEATURE: MULTIPLE STRIKETHROUGH COLORS?*/
 			color.pixel = 0;
-			color.red = 0;
+			color.red = 65535;
 			color.green = 0;
 			color.blue = 0;
 			return color;
@@ -3987,7 +3987,7 @@ ev_view_annotation_color(EvView  *view)
 		{
 			/*POSSIBLE FEATURE: MULTIPLE SQUIGGLY COLORS?*/
 			color.pixel = 0;
-			color.red = 0;
+			color.red = 65535;
 			color.green = 0;
 			color.blue = 0;
 			return color;
