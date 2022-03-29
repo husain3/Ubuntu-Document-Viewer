@@ -168,7 +168,7 @@ ev_annotation_action_select_annotation (EvAnnotationAction     *annotation_actio
 
 	switch (annot_type) {
         case EV_ANNOTATION_ACTION_TYPE_NOTE:
-                icon_name = "user-available-symbolic";
+                icon_name = "note-symbolic";
                 tooltip = _("Add note");
 		break;
         case EV_ANNOTATION_ACTION_TYPE_HIGHLIGHT:
@@ -264,6 +264,19 @@ ev_annotation_action_class_init (EvAnnotationActionClass *klass)
 }
 
 static void
+ev_custom_icon_to_builtin_theme (const gchar *icon_file_path,
+         const gchar *custom_icon_name)
+{
+        GdkPixbuf *pixbuf = gdk_pixbuf_new_from_file(icon_file_path, NULL);
+        int width, height;
+        gdk_pixbuf_get_file_info (icon_file_path, &width, &height);
+        gtk_icon_theme_add_builtin_icon (custom_icon_name, width, pixbuf);
+        g_object_unref (G_OBJECT(pixbuf));
+
+
+}
+
+static void
 ev_annotation_action_init (EvAnnotationAction *annotation_action)
 {
         EvAnnotationActionPrivate *priv = GET_PRIVATE (annotation_action);
@@ -284,6 +297,7 @@ ev_annotation_action_init (EvAnnotationAction *annotation_action)
         gtk_style_context_add_class (style_context, GTK_STYLE_CLASS_RAISED);
         gtk_style_context_add_class (style_context, GTK_STYLE_CLASS_LINKED);
 
+        ev_custom_icon_to_builtin_theme("../data/icons/scalable/actions/note-symbolic.svg", "note-symbolic");
 
 
 
