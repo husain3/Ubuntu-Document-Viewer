@@ -1,1 +1,7 @@
 _build/
+shell/tags*
+libview/tags*
+tags*
+subprojects/gi-docgen/
+.vscode
+build_cmd.txt

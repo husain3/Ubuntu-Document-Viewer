@@ -978,6 +978,15 @@ ev_application_startup (GApplication *gapplication)
           "win.fullscreen",             "F11", NULL,
           "win.presentation",           "F5", "<Shift>F5", NULL,
           "win.continuous",             "c", NULL,
+
+          "win.select-annotation::highlight", "<Ctrl>H", NULL,
+          "win.select-annotation::yellow_highlight", NULL, NULL,
+          "win.select-annotation::blue_highlight", NULL, NULL,
+          "win.select-annotation::pink_highlight", NULL, NULL,
+          "win.select-annotation::green_highlight", NULL, NULL,
+
+          "win.select-annotation::note", NULL, NULL,
+
           "win.dual-page",              "d", NULL,
           "win.dual-odd-left",          "o", NULL,
           "win.rotate-left",            "<Ctrl>Left", NULL,

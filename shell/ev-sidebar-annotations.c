@@ -436,7 +436,7 @@ job_finished_callback (EvJobAnnots          *job,
 				markup = g_strdup_printf ("%s", tooltip);
 
 			if (EV_IS_ANNOTATION_TEXT (annot)) {
-				icon_name = EV_STOCK_ANNOT_TEXT;
+				icon_name = "note-symbolic";
 			} else if (EV_IS_ANNOTATION_ATTACHMENT (annot)) {
 				icon_name = "mail-attachment-symbolic";
 			} else if (EV_IS_ANNOTATION_TEXT_MARKUP (annot)) {

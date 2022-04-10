@@ -5243,6 +5243,7 @@ ev_window_cmd_escape (GSimpleAction *action,
 		 * toolbar button. */
 		ev_window_cancel_add_annot (window);
 		ev_annotations_toolbar_add_annot_finished (EV_ANNOTATIONS_TOOLBAR (priv->annots_toolbar));
+		ev_toolbar_add_annot_finished (EV_TOOLBAR (priv->toolbar));
 		gtk_widget_grab_focus (priv->view);
 	}
 }
@@ -6091,6 +6092,30 @@ ev_window_cmd_toggle_edit_annots (GSimpleAction *action,
 }
 
 static void
+ev_window_change_select_annotation_action_state (GSimpleAction *action,
+						 GVariant *state,
+						 gpointer user_data)
+{
+	EvWindow *ev_window = user_data;
+	EvWindowPrivate *priv = GET_PRIVATE (ev_window);
+	EvToolbar *toolbar;
+	const gchar *mode;
+
+	toolbar = priv->toolbar ? EV_TOOLBAR (priv->toolbar) : EV_TOOLBAR (priv->toolbar);
+
+	mode = g_variant_get_string (state, NULL);
+
+	if (g_str_equal (mode, "note"))
+		ev_toolbar_select_annotation_type (toolbar, EV_ANNOTATION_ACTION_TYPE_NOTE);
+	else if (g_str_equal (mode, "highlight"))
+		ev_toolbar_select_annotation_type (toolbar, EV_ANNOTATION_ACTION_TYPE_HIGHLIGHT);
+	else
+		g_assert_not_reached();
+
+	g_simple_action_set_state (action, state);
+}
+
+static void
 ev_window_dispose (GObject *object)
 {
 	EvWindow *window = EV_WINDOW (object);
@@ -6426,6 +6451,7 @@ static const GActionEntry actions[] = {
 	{ "add-annotation", NULL, NULL, "false", ev_window_cmd_add_annotation },
 	{ "highlight-annotation", NULL, NULL, "false", ev_window_cmd_add_highlight_annotation },
 	{ "toggle-edit-annots", NULL, NULL, "false", ev_window_cmd_toggle_edit_annots },
+	{ "select-annotation", NULL, "s", "'yellow_highlight'", ev_window_change_select_annotation_action_state },
 	{ "about", ev_window_cmd_about },
 	{ "help", ev_window_cmd_help },
 	/* Popups specific items */
@@ -6501,7 +6527,6 @@ ev_window_begin_add_annot (EvWindow        *window,
 		ev_view_add_text_markup_annotation_for_selected_text (EV_VIEW (priv->view));
 		return;
 	}
-
 	ev_view_begin_add_annotation (EV_VIEW (priv->view), annot_type);
 }
 
@@ -6515,6 +6540,8 @@ view_annot_added (EvView       *view,
 	ev_sidebar_annotations_annot_added (EV_SIDEBAR_ANNOTATIONS (priv->sidebar_annots),
 					    annot);
 	ev_annotations_toolbar_add_annot_finished (EV_ANNOTATIONS_TOOLBAR (priv->annots_toolbar));
+
+	ev_toolbar_add_annot_finished (EV_TOOLBAR (priv->toolbar));
 }
 
 static void
@@ -8039,6 +8066,18 @@ ev_window_get_history (EvWindow *ev_window)
 	priv = GET_PRIVATE (ev_window);
 
 	return priv->history;
+}
+
+EvView *
+ev_window_get_view (EvWindow *ev_window)
+{
+	EvWindowPrivate *priv;
+
+	g_return_val_if_fail (EV_WINDOW (ev_window), NULL);
+
+	priv = GET_PRIVATE (ev_window);
+
+	return EV_VIEW (priv->view);
 }
 
 EvDocumentModel *
