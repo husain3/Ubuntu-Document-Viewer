@@ -1,4 +1,5 @@
 evince_sources = files(
+  'ev-annotation-action.c',
   'ev-annotation-properties-dialog.c',
   'ev-annotations-toolbar.c',
   'ev-application.c',

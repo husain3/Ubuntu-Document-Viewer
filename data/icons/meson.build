@@ -60,6 +60,7 @@ icons += [['48x48', actions, []]]
 icons += [['256x256', [], []]]
 
 actions = [
+  'note-symbolic.svg',
   'annotations-text-symbolic.svg',
   'annotations-squiggly-symbolic.svg',
   'find-unsupported-symbolic.svg',
