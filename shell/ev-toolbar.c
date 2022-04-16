@@ -164,10 +164,11 @@ zoom_selector_activated (GtkWidget *zoom_action,
         ev_window_focus_view (priv->window);
 }
 
-
 static void
-ev_toolbar_begin_add_annot (EvToolbar *ev_toolbar,
-                            EvAnnotationType annot_type)
+ev_toolbar_begin_add_annot(EvToolbar *ev_toolbar,
+                           EvAnnotationType annot_type,
+                           EvAnnotationTextMarkupType annot_markup_type,
+                           EvAnnotationColor annot_color)
 {
         EvToolbarPrivate *priv = GET_PRIVATE (ev_toolbar);
         EvView *view = ev_window_get_view (priv->window);
@@ -175,11 +176,11 @@ ev_toolbar_begin_add_annot (EvToolbar *ev_toolbar,
         if (annot_type == EV_ANNOTATION_TYPE_TEXT_MARKUP &&
             ev_view_get_has_selection (view))
         {
-                ev_view_add_text_markup_annotation_for_selected_text (view);
+                ev_view_add_text_markup_annotation_for_selected_text1 (view, annot_markup_type, annot_color);
                 return;
         }
 
-        ev_view_begin_add_annotation (view, annot_type);
+        ev_view_begin_add_annotation1 (view, annot_type, annot_markup_type, annot_color);
 }
 
 void
@@ -287,7 +288,7 @@ ev_toolbar_constructed (GObject *object)
         hdy_header_bar_pack_start (HDY_HEADER_BAR (ev_toolbar), vbox);
 
         /* Edit Annots */
-        button = ev_toolbar_create_toggle_button (ev_toolbar, "win.toggle-edit-annots", "document-edit-symbolic",
+        button = ev_toolbar_create_toggle_button (ev_toolbar, "win.toggle-edit-annots", "marker-symbolic",
                                                   _("Annotate the document"));
         atk_object_set_name (gtk_widget_get_accessible (button), _("Annotate document"));
         priv->annots_button = button;
@@ -443,7 +444,6 @@ ev_toolbar_set_mode (EvToolbar     *ev_toolbar,
                 gtk_widget_show (priv->page_selector);
                 gtk_widget_show (priv->find_button);
                 gtk_widget_show (priv->annots_action);
-                gtk_widget_show (priv->annots_button);
                 gtk_widget_hide (priv->open_button);
                 break;
 	case EV_TOOLBAR_MODE_RECENT_VIEW:
@@ -453,7 +453,6 @@ ev_toolbar_set_mode (EvToolbar     *ev_toolbar,
                 gtk_widget_hide (priv->page_selector);
                 gtk_widget_hide (priv->find_button);
                 gtk_widget_hide(priv->annots_action);
-                gtk_widget_hide (priv->annots_button);
                 gtk_widget_show (priv->open_button);
                 break;
         }

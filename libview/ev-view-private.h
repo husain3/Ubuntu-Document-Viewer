@@ -78,6 +78,22 @@ typedef enum {
 	EV_PAN_ACTION_PREV
 } EvPanAction;
 
+typedef enum {
+	EV_HIGHLIGHT_YELLOW,
+	EV_HIGHLIGHT_BLUE,
+	EV_HIGHLIGHT_GREEN,
+	EV_HIGHLIGHT_MAGENTA
+} EvHighlightColors;
+
+
+/* Might not be needed */
+typedef struct highlight_color {
+	guint32 pixel;
+	guint16 red;
+	guint16 green;
+	guint16 blue;
+} highlight_color;
+
 /* Annotation popup windows */
 typedef struct {
 	GtkWidget *window;
@@ -119,7 +135,10 @@ typedef struct {
 	GdkPoint         stop;
 	gboolean         adding_annot;
 	EvAnnotationType type;
+	EvAnnotationTextMarkupType markup_type;
+	EvAnnotationColor       color;
 	EvAnnotation    *annot;
+	gint		text_preselected;
 } AddingAnnotInfo;
 
 typedef struct {
@@ -240,6 +259,10 @@ struct _EvView {
 	MovingAnnotInfo    moving_annot_info;
 	GHashTable        *annot_window_map;
 	gboolean           enable_spellchecking;
+
+	/* Annotations from Selection */
+	GdkPoint annot_selection_start;
+	GdkPoint annot_selection_stop;
 
 	/* Focus */
 	EvMapping *focused_element;

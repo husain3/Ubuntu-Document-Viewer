@@ -442,16 +442,18 @@ job_finished_callback (EvJobAnnots          *job,
 			} else if (EV_IS_ANNOTATION_TEXT_MARKUP (annot)) {
                                 switch (ev_annotation_text_markup_get_markup_type (EV_ANNOTATION_TEXT_MARKUP (annot))) {
                                 case EV_ANNOTATION_TEXT_MARKUP_HIGHLIGHT:
-                                        icon_name = "format-justify-left-symbolic";
+                                        icon_name = "marker-symbolic";
                                         break;
                                 case EV_ANNOTATION_TEXT_MARKUP_STRIKE_OUT:
-                                        icon_name = "format-text-strikethrough-symbolic";
+                                        icon_name = "text-strikethrough-symbolic";
                                         break;
                                 case EV_ANNOTATION_TEXT_MARKUP_UNDERLINE:
-                                        icon_name = "format-text-underline-symbolic";
+                                        icon_name = "text-underline-symbolic";
                                         break;
                                 case EV_ANNOTATION_TEXT_MARKUP_SQUIGGLY:
-                                        icon_name = EV_STOCK_ANNOT_SQUIGGLY;
+                                        icon_name = "text-squiggly-symbolic";
+                                        break;
+                                case EV_ANNOTATION_TEXT_MARKUP_NONE:
                                         break;
                                 }
                         }

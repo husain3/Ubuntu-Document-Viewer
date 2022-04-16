@@ -61,8 +61,7 @@ icons += [['256x256', [], []]]
 
 actions = [
   'note-symbolic.svg',
-  'annotations-text-symbolic.svg',
-  'annotations-squiggly-symbolic.svg',
+  'marker-symbolic.svg',
   'find-unsupported-symbolic.svg',
   'object-rotate-left.svg',
   'object-rotate-right.svg',

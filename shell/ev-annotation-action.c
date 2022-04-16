@@ -20,6 +20,7 @@
 
 #include "config.h"
 #include "ev-annotation-action.h"
+#include "ev-annotations-marshal.h"
 
 #include <glib/gi18n.h>
 #include <evince-document.h>
@@ -61,17 +62,47 @@ ev_annotations_action_toggle_button_if_active (EvAnnotationAction *annotation_ac
 static guint signals[LAST_SIGNAL] = {0};
 
 static void
-ev_annotation_action_switch_annot_settings (EvAnnotationAction *annotation_action,
-                                            EvAnnotationType   *annot_type)
+ev_annotation_action_switch_annot_settings (EvAnnotationAction          *annotation_action,
+                                            EvAnnotationType            *annot_type,
+                                            EvAnnotationTextMarkupType  *annot_markup_type,
+                                            EvAnnotationColor           *annot_color)
 {
     EvAnnotationActionPrivate *priv = GET_PRIVATE (annotation_action);
     switch (priv->active_annot_type)
     {
     case EV_ANNOTATION_ACTION_TYPE_NOTE:
         *annot_type = EV_ANNOTATION_TYPE_TEXT;
+        *annot_markup_type = EV_ANNOTATION_TEXT_MARKUP_NONE;
+        *annot_color = EV_ANNOTATION_COLOR_YELLOW;
         break;
     case EV_ANNOTATION_ACTION_TYPE_HIGHLIGHT:
         *annot_type = EV_ANNOTATION_TYPE_TEXT_MARKUP;
+        *annot_markup_type = EV_ANNOTATION_TEXT_MARKUP_HIGHLIGHT;
+        *annot_color = EV_ANNOTATION_COLOR_YELLOW;
+        break;
+    case EV_ANNOTATION_ACTION_TYPE_HIGHLIGHT_YELLOW:
+        *annot_type = EV_ANNOTATION_TYPE_TEXT_MARKUP;
+        *annot_markup_type = EV_ANNOTATION_TEXT_MARKUP_HIGHLIGHT;
+        *annot_color = EV_ANNOTATION_COLOR_YELLOW;
+        priv->last_used_highlight_color = EV_ANNOTATION_ACTION_TYPE_HIGHLIGHT_YELLOW;
+        break;
+    case EV_ANNOTATION_ACTION_TYPE_HIGHLIGHT_BLUE:
+        *annot_type = EV_ANNOTATION_TYPE_TEXT_MARKUP;
+        *annot_markup_type = EV_ANNOTATION_TEXT_MARKUP_HIGHLIGHT;
+        *annot_color = EV_ANNOTATION_COLOR_CYAN;
+        priv->last_used_highlight_color = EV_ANNOTATION_ACTION_TYPE_HIGHLIGHT_BLUE;
+        break;
+    case EV_ANNOTATION_ACTION_TYPE_HIGHLIGHT_PINK:
+        *annot_type = EV_ANNOTATION_TYPE_TEXT_MARKUP;
+        *annot_markup_type = EV_ANNOTATION_TEXT_MARKUP_HIGHLIGHT;
+        *annot_color = EV_ANNOTATION_COLOR_MAGENTA;
+        priv->last_used_highlight_color = EV_ANNOTATION_ACTION_TYPE_HIGHLIGHT_PINK;
+        break;
+    case EV_ANNOTATION_ACTION_TYPE_HIGHLIGHT_GREEN:
+        *annot_type = EV_ANNOTATION_TYPE_TEXT_MARKUP;
+        *annot_markup_type = EV_ANNOTATION_TEXT_MARKUP_HIGHLIGHT;
+        *annot_color = EV_ANNOTATION_COLOR_GREEN;
+        priv->last_used_highlight_color = EV_ANNOTATION_ACTION_TYPE_HIGHLIGHT_GREEN;
         break;
     default:
         g_assert_not_reached();
@@ -82,30 +113,17 @@ static void
 ev_annotation_action_annot_button_toggled (GtkWidget          *button,
                                            EvAnnotationAction *annotation_action)
 {
-    EvAnnotationActionPrivate *priv = GET_PRIVATE (annotation_action);
     EvAnnotationType annot_type;
+    EvAnnotationTextMarkupType annot_markup_type;
+    EvAnnotationColor annot_color;
 
-    if (!gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON(button)))
-    {
-        g_signal_emit (annotation_action, signals[CANCEL_ADD_ANNOT], 0, NULL);
+    if (!gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (button))) {
         return;
     }
 
-    switch (priv->active_annot_type)
-    {
-    case EV_ANNOTATION_ACTION_TYPE_NOTE:
-        annot_type = EV_ANNOTATION_TYPE_TEXT;
-        break;
-    case EV_ANNOTATION_ACTION_TYPE_HIGHLIGHT:
-        annot_type = EV_ANNOTATION_TYPE_TEXT_MARKUP;
-        break;
-    default:
-        g_assert_not_reached();
-    }
+    ev_annotation_action_switch_annot_settings (annotation_action, &annot_type, &annot_markup_type, &annot_color);
 
-    ev_annotation_action_switch_annot_settings (annotation_action, &annot_type);
-
-    g_signal_emit (annotation_action, signals[BEGIN_ADD_ANNOT], 0, annot_type);
+    g_signal_emit (annotation_action, signals[BEGIN_ADD_ANNOT], 0, annot_type, annot_markup_type, annot_color);
 }
 
 void
@@ -121,18 +139,28 @@ ev_annotation_action_select_annotation (EvAnnotationAction     *annotation_actio
 
     priv = GET_PRIVATE (annotation_action);
 
-    priv->active_annot_type = annot_type;
-    switch (annot_type)
+    if (annot_type == EV_ANNOTATION_ACTION_TYPE_HIGHLIGHT)
     {
+            priv->active_annot_type = priv->last_used_highlight_color;
+    } else {
+            priv->active_annot_type = annot_type;
+    }
+
+    switch (annot_type) {
     case EV_ANNOTATION_ACTION_TYPE_NOTE:
         icon_name = "note-symbolic";
-        tooltip = _("Add text annotation");
+        tooltip = _("Add note");
         break;
     case EV_ANNOTATION_ACTION_TYPE_HIGHLIGHT:
+    case EV_ANNOTATION_ACTION_TYPE_HIGHLIGHT_YELLOW:
+    case EV_ANNOTATION_ACTION_TYPE_HIGHLIGHT_BLUE:
+    case EV_ANNOTATION_ACTION_TYPE_HIGHLIGHT_PINK:
+    case EV_ANNOTATION_ACTION_TYPE_HIGHLIGHT_GREEN:
         icon_name = "marker-symbolic";
         tooltip = _("Add highlight annotation");
         break;
     }
+
     image = gtk_image_new_from_icon_name (icon_name,
                                           GTK_ICON_SIZE_MENU);
     gtk_button_set_image (GTK_BUTTON (priv->annot_button), image);
@@ -141,15 +169,18 @@ ev_annotation_action_select_annotation (EvAnnotationAction     *annotation_actio
     g_signal_emit (annotation_action, signals[ACTIVATED], 0, NULL);
 
     EvAnnotationType new_annot_type;
+    EvAnnotationTextMarkupType annot_markup_type;
+    EvAnnotationColor annot_color;
 
-    ev_annotation_action_switch_annot_settings (annotation_action, &new_annot_type);
+    ev_annotation_action_switch_annot_settings (annotation_action, &new_annot_type, &annot_markup_type, &annot_color);
 
     g_signal_emit (annotation_action, signals[CANCEL_ADD_ANNOT], 0, NULL);
 
+
     ev_annotations_action_toggle_button_if_inactive (annotation_action, GTK_TOGGLE_BUTTON (priv->annot_button));
 
-    g_signal_emit (annotation_action, signals[BEGIN_ADD_ANNOT], 0, new_annot_type);
 
+    g_signal_emit (annotation_action, signals[BEGIN_ADD_ANNOT], 0, new_annot_type, annot_markup_type, annot_color);
 }
 
 static void
@@ -192,9 +223,11 @@ ev_annotation_action_class_init (EvAnnotationActionClass *klass)
                      G_SIGNAL_RUN_LAST,
                      0,
                      NULL, NULL,
-                     g_cclosure_marshal_VOID__ENUM,
-                     G_TYPE_NONE, 1,
-                     EV_TYPE_ANNOTATION_TYPE);
+                     g_cclosure_user_marshal_VOID__ENUM_ENUM_ENUM,
+                     G_TYPE_NONE, 3,
+                     EV_TYPE_ANNOTATION_TYPE,
+                     EV_TYPE_ANNOTATION_TEXT_MARKUP_TYPE,
+                     EV_TYPE_ANNOTATION_COLOR);
     signals[CANCEL_ADD_ANNOT] =
         g_signal_new ("cancel-add-annot",
                      G_TYPE_FROM_CLASS (object_class),
@@ -268,6 +301,10 @@ ev_annotation_action_init (EvAnnotationAction *annotation_action)
     gtk_box_pack_start (GTK_BOX (annotation_action), button,
                         FALSE, FALSE, 0);
     priv->annot_menu = button;
+
+    /* GET LAST USED ANNOTATION */
+    priv->last_used_highlight_color = EV_ANNOTATION_ACTION_TYPE_HIGHLIGHT_YELLOW;
+    priv->active_annot_type = EV_ANNOTATION_ACTION_TYPE_HIGHLIGHT_YELLOW;
 
     menu = G_MENU_MODEL (gtk_builder_get_object (builder, "annotation-menu"));
     gtk_menu_button_set_menu_model (GTK_MENU_BUTTON (button), menu);
