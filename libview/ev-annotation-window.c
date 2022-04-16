@@ -542,6 +542,16 @@ static gboolean
 ev_annotation_window_focus_out_event (GtkWidget     *widget,
 				      GdkEventFocus *event)
 {
+	// EvAnnotationWindow *window = EV_ANNOTATION_WINDOW (widget);
+
+	return FALSE;
+}
+
+static gboolean
+ev_annotation_window_key_release_event (GtkWidget     *widget,
+                                        GdkEventKey   *event)
+{
+
 	EvAnnotationWindow *window = EV_ANNOTATION_WINDOW (widget);
 
 	ev_annotation_window_sync_contents (window);
@@ -574,7 +584,8 @@ ev_annotation_window_class_init (EvAnnotationWindowClass *klass)
 	gtk_widget_class->configure_event = ev_annotation_window_configure_event;
 	gtk_widget_class->focus_in_event = ev_annotation_window_focus_in_event;
 	gtk_widget_class->focus_out_event = ev_annotation_window_focus_out_event;
-        gtk_widget_class->key_press_event = ev_annotation_window_key_press_event;
+	gtk_widget_class->key_press_event = ev_annotation_window_key_press_event;
+	gtk_widget_class->key_release_event = ev_annotation_window_key_release_event;
 
 	gtk_widget_class_set_css_name (gtk_widget_class, "evannotationwindow");
 	g_object_class_install_property (g_object_class,

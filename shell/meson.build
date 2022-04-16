@@ -1,3 +1,5 @@
+#shell_inc = include_directories('.')
+
 evince_sources = files(
   'ev-annotation-action.c',
   'ev-annotation-properties-dialog.c',
@@ -32,6 +34,16 @@ evince_sources = files(
   'ev-zoom-action.c',
   'main.c',
 )
+
+marshal = 'ev-annotations-marshal'
+
+marshal_sources = gnome.genmarshal(
+  'ev-annotations-marshal',
+  sources: 'ev-annotations-toolbar-marshal.list',
+  internal: true,
+)
+
+evince_css = (gtk_dep.version().version_compare('>= 3.20.0') ? 'evince.css' : 'evince-3.18.css')
 
 resource_data = files(
   'evince.css',
@@ -112,12 +124,28 @@ if enable_keyring
   evince_deps += libsecret_dep
 endif
 
-evince = executable(
+libshell = shared_library(
+  'shell' + ev_major_version.to_string(),
+  version: ev_view_version,
+  sources: marshal_sources,
+  include_directories: top_inc,
+  dependencies: evince_deps,
+  c_args: evince_cflags,
+)
+
+#libshell_dep = declare_dependency(
+#  include_directories: shell_inc,
+#  link_with: libshell,
+#)
+
+executable(
   'evince',
   sources: evince_sources,
   include_directories: top_inc,
   dependencies: evince_deps,
   c_args: evince_cflags,
+  objects: libshell.extract_all_objects(),
+  link_args: evince_ldflags,
   install: true,
 )
 
