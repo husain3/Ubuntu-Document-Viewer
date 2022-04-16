@@ -104,6 +104,21 @@ ev_annotation_action_switch_annot_settings (EvAnnotationAction *annotation_actio
                 *annot_color = EV_ANNOTATION_COLOR_GREEN;
                 priv->last_used_highlight_color = EV_ANNOTATION_ACTION_TYPE_HIGHLIGHT_GREEN;
                 break;
+        case EV_ANNOTATION_ACTION_TYPE_UNDERLINE:
+                *annot_type = EV_ANNOTATION_TYPE_TEXT_MARKUP;
+                *annot_markup_type = EV_ANNOTATION_TEXT_MARKUP_UNDERLINE;
+                *annot_color = EV_ANNOTATION_COLOR_NONE;
+                break;
+        case EV_ANNOTATION_ACTION_TYPE_STRIKE_OUT:
+                *annot_type = EV_ANNOTATION_TYPE_TEXT_MARKUP;
+                *annot_markup_type = EV_ANNOTATION_TEXT_MARKUP_STRIKE_OUT;
+                *annot_color = EV_ANNOTATION_COLOR_NONE;
+                break;
+        case EV_ANNOTATION_ACTION_TYPE_SQUIGGLY:
+                *annot_type = EV_ANNOTATION_TYPE_TEXT_MARKUP;
+                *annot_markup_type = EV_ANNOTATION_TEXT_MARKUP_SQUIGGLY;
+                *annot_color = EV_ANNOTATION_COLOR_NONE;
+                break;
         default:
                 g_assert_not_reached();
         }
@@ -160,7 +175,19 @@ ev_annotation_action_select_annotation (EvAnnotationAction     *annotation_actio
         case EV_ANNOTATION_ACTION_TYPE_HIGHLIGHT_GREEN:
                 icon_name = "marker-symbolic";
                 tooltip = _("Add highlight annotation");
-		break;
+                break;
+        case EV_ANNOTATION_ACTION_TYPE_STRIKE_OUT:
+                icon_name = "text-strikethrough-symbolic";
+                tooltip = _("Add strikethrough annotation");
+                break;
+        case EV_ANNOTATION_ACTION_TYPE_UNDERLINE:
+                icon_name = "text-underline-symbolic";
+                tooltip = _("Add underline annotation");
+                break;
+        case EV_ANNOTATION_ACTION_TYPE_SQUIGGLY:
+                icon_name = "text-squiggly-symbolic";
+                tooltip = _("Add squiggly annotation");
+                break;
         }
 
         image = gtk_image_new_from_icon_name (icon_name,
@@ -276,6 +303,9 @@ ev_annotation_action_init (EvAnnotationAction *annotation_action)
         gtk_style_context_add_class (style_context, GTK_STYLE_CLASS_LINKED);
 
         ev_custom_icon_to_builtin_theme("../data/icons/scalable/actions/note-symbolic.svg", "note-symbolic");
+        ev_custom_icon_to_builtin_theme("../data/icons/scalable/actions/format-text-strikethrough-symbolic.svg", "text-strikethrough-symbolic");
+        ev_custom_icon_to_builtin_theme("../data/icons/scalable/actions/text-squiggly-symbolic.svg", "text-squiggly-symbolic");
+        ev_custom_icon_to_builtin_theme("../data/icons/scalable/actions/text-underline-symbolic.svg", "text-underline-symbolic");
 
 
 

@@ -3956,21 +3956,21 @@ ev_view_annotation_color(EvView  *view)
 			case EV_ANNOTATION_TEXT_MARKUP_UNDERLINE:
 				/* POSSIBLE FEATURE: MULTIPLE UNDERLINE COLORS? */
 				color.pixel = 0;
-				color.red = 0;
+				color.red = 65535;
 				color.green = 0;
 				color.blue = 0;
 				return color;
 			case EV_ANNOTATION_TEXT_MARKUP_STRIKE_OUT:
 				/* POSSIBLE FEATURE: MULTIPLE STRIKETHROUGH COLORS? */
 				color.pixel = 0;
-				color.red = 0;
+				color.red = 65535;
 				color.green = 0;
 				color.blue = 0;
 				return color;
 			case EV_ANNOTATION_TEXT_MARKUP_SQUIGGLY:
 				/* POSSIBLE FEATURE: MULTIPLE SQUIGGLY COLORS? */
 				color.pixel = 0;
-				color.red = 0;
+				color.red = 65535;
 				color.green = 0;
 				color.blue = 0;
 				return color;
