@@ -979,11 +979,16 @@ ev_application_startup (GApplication *gapplication)
           "win.presentation",           "F5", "<Shift>F5", NULL,
           "win.continuous",             "c", NULL,
 
+          "win.select-annotation::underline", "<Ctrl>U", NULL,
+
           "win.select-annotation::highlight", "<Ctrl>H", NULL,
           "win.select-annotation::yellow_highlight", NULL, NULL,
           "win.select-annotation::blue_highlight", NULL, NULL,
           "win.select-annotation::pink_highlight", NULL, NULL,
           "win.select-annotation::green_highlight", NULL, NULL,
+
+          "win.select-annotation::strikethrough", NULL, NULL,
+          "win.select-annotation::squiggly", NULL, NULL,
 
           "win.select-annotation::note", NULL, NULL,
 

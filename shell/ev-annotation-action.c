@@ -59,6 +59,10 @@ static gboolean
 ev_annotations_action_toggle_button_if_active (EvAnnotationAction *annotation_action,
                                                GtkToggleButton    *button);
 
+static void
+ev_custom_icon_to_builtin_theme (const gchar *icon_file_path,
+                                 const gchar *custom_icon_name);
+
 static guint signals[LAST_SIGNAL] = {0};
 
 static void
@@ -103,6 +107,21 @@ ev_annotation_action_switch_annot_settings (EvAnnotationAction          *annotat
         *annot_markup_type = EV_ANNOTATION_TEXT_MARKUP_HIGHLIGHT;
         *annot_color = EV_ANNOTATION_COLOR_GREEN;
         priv->last_used_highlight_color = EV_ANNOTATION_ACTION_TYPE_HIGHLIGHT_GREEN;
+        break;
+    case EV_ANNOTATION_ACTION_TYPE_UNDERLINE:
+        *annot_type = EV_ANNOTATION_TYPE_TEXT_MARKUP;
+        *annot_markup_type = EV_ANNOTATION_TEXT_MARKUP_UNDERLINE;
+        *annot_color = EV_ANNOTATION_COLOR_NONE;
+        break;
+    case EV_ANNOTATION_ACTION_TYPE_STRIKE_OUT:
+        *annot_type = EV_ANNOTATION_TYPE_TEXT_MARKUP;
+        *annot_markup_type = EV_ANNOTATION_TEXT_MARKUP_STRIKE_OUT;
+        *annot_color = EV_ANNOTATION_COLOR_NONE;
+        break;
+    case EV_ANNOTATION_ACTION_TYPE_SQUIGGLY:
+        *annot_type = EV_ANNOTATION_TYPE_TEXT_MARKUP;
+        *annot_markup_type = EV_ANNOTATION_TEXT_MARKUP_SQUIGGLY;
+        *annot_color = EV_ANNOTATION_COLOR_NONE;
         break;
     default:
         g_assert_not_reached();
@@ -158,6 +177,18 @@ ev_annotation_action_select_annotation (EvAnnotationAction     *annotation_actio
     case EV_ANNOTATION_ACTION_TYPE_HIGHLIGHT_GREEN:
         icon_name = "marker-symbolic";
         tooltip = _("Add highlight annotation");
+        break;
+    case EV_ANNOTATION_ACTION_TYPE_STRIKE_OUT:
+        icon_name = "text-strikethrough-symbolic";
+        tooltip = _("Add strikethrough annotation");
+        break;
+    case EV_ANNOTATION_ACTION_TYPE_UNDERLINE:
+        icon_name = "text-underline-symbolic";
+        tooltip = _("Add underline annotation");
+        break;
+    case EV_ANNOTATION_ACTION_TYPE_SQUIGGLY:
+        icon_name = "text-squiggly-symbolic";
+        tooltip = _("Add squiggly annotation");
         break;
     }
 
@@ -272,6 +303,9 @@ ev_annotation_action_init (EvAnnotationAction *annotation_action)
     gtk_style_context_add_class (style_context, GTK_STYLE_CLASS_LINKED);
 
     ev_custom_icon_to_builtin_theme ("../data/icons/scalable/actions/note-symbolic.svg", "note-symbolic");
+    ev_custom_icon_to_builtin_theme ("../data/icons/scalable/actions/format-text-strikethrough-symbolic.svg", "text-strikethrough-symbolic");
+    ev_custom_icon_to_builtin_theme ("../data/icons/scalable/actions/text-squiggly-symbolic.svg", "text-squiggly-symbolic");
+    ev_custom_icon_to_builtin_theme ("../data/icons/scalable/actions/text-underline-symbolic.svg", "text-underline-symbolic");
 
     button = gtk_toggle_button_new ();
     image = gtk_image_new_from_icon_name ("marker-symbolic",
