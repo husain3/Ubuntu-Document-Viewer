@@ -777,6 +777,27 @@ ev_annotation_set_area (EvAnnotation      *annot,
         return TRUE;
 }
 
+gboolean
+ev_annotation_set_preselected_area (EvAnnotation      *annot,
+									const EvRectangle *area)
+{
+	gboolean was_initial;
+
+    g_return_val_if_fail (EV_IS_ANNOTATION (annot), FALSE);
+    g_return_val_if_fail (area != NULL, FALSE);
+
+    was_initial = annot->area.x1 == -1 && annot->area.x2 == -1
+            && annot->area.y1 == -1 && annot->area.y2 == -1;
+
+	annot->area = *area;
+
+    if (!was_initial) {
+		g_object_notify (G_OBJECT (annot), "area");
+	}
+
+    return TRUE;
+}
+
 /* EvAnnotationMarkup */
 typedef struct {
 	gchar   *label;
@@ -1475,7 +1496,7 @@ ev_annotation_text_markup_class_init (EvAnnotationTextMarkupClass *class)
 							    "Type",
 							    "The text markup annotation type",
 							    EV_TYPE_ANNOTATION_TEXT_MARKUP_TYPE,
-							    EV_ANNOTATION_TEXT_MARKUP_HIGHLIGHT,
+							    EV_ANNOTATION_TEXT_MARKUP_UNDERLINE,
 							    G_PARAM_READWRITE |
                                                             G_PARAM_CONSTRUCT |
                                                             G_PARAM_STATIC_STRINGS));
@@ -1489,11 +1510,11 @@ ev_annotation_text_markup_markup_iface_init (EvAnnotationMarkupInterface *iface)
 EvAnnotation *
 ev_annotation_text_markup_highlight_new (EvPage *page)
 {
-        EvAnnotation *annot = EV_ANNOTATION (g_object_new (EV_TYPE_ANNOTATION_TEXT_MARKUP,
-                                                           "page", page,
-                                                           "type", EV_ANNOTATION_TEXT_MARKUP_HIGHLIGHT,
-                                                           NULL));
-        return annot;
+	EvAnnotation *annot = EV_ANNOTATION(g_object_new(EV_TYPE_ANNOTATION_TEXT_MARKUP,
+							    "page", page,
+							    "type", EV_ANNOTATION_TEXT_MARKUP_HIGHLIGHT,
+							    NULL));
+	return annot;
 }
 
 EvAnnotation *

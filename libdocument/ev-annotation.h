@@ -96,6 +96,14 @@ typedef enum {
 } EvAnnotationType;
 
 typedef enum {
+	EV_ANNOTATION_COLOR_YELLOW,
+	EV_ANNOTATION_COLOR_CYAN,
+	EV_ANNOTATION_COLOR_GREEN,
+	EV_ANNOTATION_COLOR_MAGENTA,
+	EV_ANNOTATION_COLOR_NONE
+} EvAnnotationColor;
+
+typedef enum {
 	EV_ANNOTATION_TEXT_ICON_NOTE,
 	EV_ANNOTATION_TEXT_ICON_COMMENT,
 	EV_ANNOTATION_TEXT_ICON_KEY,
@@ -112,7 +120,8 @@ typedef enum {
         EV_ANNOTATION_TEXT_MARKUP_HIGHLIGHT,
         EV_ANNOTATION_TEXT_MARKUP_STRIKE_OUT,
         EV_ANNOTATION_TEXT_MARKUP_UNDERLINE,
-        EV_ANNOTATION_TEXT_MARKUP_SQUIGGLY
+        EV_ANNOTATION_TEXT_MARKUP_SQUIGGLY,
+        EV_ANNOTATION_TEXT_MARKUP_NONE
 } EvAnnotationTextMarkupType;
 
 /* EvAnnotation */
@@ -172,6 +181,8 @@ void                 ev_annotation_get_area                  (EvAnnotation      
 EV_PUBLIC
 gboolean             ev_annotation_set_area                  (EvAnnotation           *annot,
                                                               const EvRectangle      *area);
+gboolean             ev_annotation_set_preselected_area      (EvAnnotation      *annot,
+                                                              const EvRectangle *area);
 
 /* EvAnnotationMarkup */
 EV_PUBLIC

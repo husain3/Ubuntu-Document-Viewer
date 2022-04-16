@@ -146,9 +146,24 @@
   <menu id="annotation-menu">
     <section>
       <item>
-        <attribute name="label" translatable="yes">_Highlight Text</attribute>
+        <attribute name="label" translatable="yes">_Yellow Highlight</attribute>
         <attribute name="action">win.select-annotation</attribute>
-        <attribute name="target">highlight</attribute>
+        <attribute name="target">yellow_highlight</attribute>
+      </item>
+      <item>
+        <attribute name="label" translatable="yes">_Blue Highlight</attribute>
+        <attribute name="action">win.select-annotation</attribute>
+        <attribute name="target">blue_highlight</attribute>
+      </item>
+      <item>
+        <attribute name="label" translatable="yes">_Pink Highlight</attribute>
+        <attribute name="action">win.select-annotation</attribute>
+        <attribute name="target">pink_highlight</attribute>
+      </item>
+      <item>
+        <attribute name="label" translatable="yes">_Green Highlight</attribute>
+        <attribute name="action">win.select-annotation</attribute>
+        <attribute name="target">green_highlight</attribute>
       </item>
       <item>
         <attribute name="label" translatable="yes">_Note Text</attribute>

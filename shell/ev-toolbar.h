@@ -61,7 +61,7 @@ EvToolbarMode ev_toolbar_get_mode           (EvToolbar     *ev_toolbar);
 
 void
 ev_toolbar_select_annotation_type (EvToolbar *ev_toolbar,
-			             EvAnnotationActionType annot_type);
+			             			EvAnnotationActionType annot_type);
 void
 ev_toolbar_add_annot_finished (EvToolbar *ev_toolbar);
 

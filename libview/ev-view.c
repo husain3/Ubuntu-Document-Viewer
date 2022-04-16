@@ -23,6 +23,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
+#include <ctype.h>
 
 #include <glib/gi18n-lib.h>
 #include <gtk/gtk.h>
@@ -3405,6 +3406,16 @@ ev_view_create_annotation_window (EvView       *view,
 	EvRectangle  doc_rect;
 	GdkRectangle view_rect;
 	guint        page;
+	GdkColor     color;
+
+	ev_annotation_get_color (annot, &color);
+
+	if (color.red == 0.0 && color.green == 0.0 && color.blue == 0.0)
+	{
+		color.red = 65535;
+		color.green = 65535;
+		ev_annotation_set_color(annot, &color);
+	}
 
 	window = ev_annotation_window_new (annot, parent);
 	g_signal_connect (window, "grab_focus",
@@ -3717,13 +3728,15 @@ ev_view_create_annotation_real (EvView *view,
 	EvAnnotation   *annot;
 	EvRectangle     doc_rect, popup_rect;
 	EvPage         *page;
-	GdkColor        color = { 0, 65535, 65535, 0 };
+	GdkColor        color;
 	GdkRectangle    view_rect;
 	cairo_region_t *region;
 
+	color = ev_view_annotation_color(view);
+
 	ev_document_doc_mutex_lock ();
 	page = ev_document_get_page (view->document, annot_page);
-        switch (view->adding_annot_info.type) {
+    switch (view->adding_annot_info.type) {
         case EV_ANNOTATION_TYPE_TEXT:
                 doc_rect.x1 = end.x;
                 doc_rect.y1 = end.y;
@@ -3736,7 +3749,24 @@ ev_view_create_annotation_real (EvView *view,
 		doc_rect.y1 = start.y;
 		doc_rect.x2 = end.x;
 		doc_rect.y2 = end.y;
-		annot = ev_annotation_text_markup_highlight_new (page);
+
+
+		switch (view->adding_annot_info.markup_type) {
+		case EV_ANNOTATION_TEXT_MARKUP_HIGHLIGHT:
+			annot = ev_annotation_text_markup_highlight_new (page);
+			break;
+		case EV_ANNOTATION_TEXT_MARKUP_STRIKE_OUT:
+			annot = ev_annotation_text_markup_strike_out_new (page);
+			break;
+		case EV_ANNOTATION_TEXT_MARKUP_UNDERLINE:
+			annot = ev_annotation_text_markup_underline_new (page);
+			break;
+		case EV_ANNOTATION_TEXT_MARKUP_SQUIGGLY:
+			annot = ev_annotation_text_markup_squiggly_new (page);
+			break;
+		case EV_ANNOTATION_TEXT_MARKUP_NONE:
+			break;
+		}
 		break;
 	case EV_ANNOTATION_TYPE_ATTACHMENT:
 		/* TODO */
@@ -3788,12 +3818,20 @@ ev_view_create_annotation_real (EvView *view,
 static void
 ev_view_create_annotation (EvView *view)
 {
+	EvAnnotation   *annot;
 	EvPoint         start;
 	EvPoint         end;
 	gint            annot_page;
 	gint            offset;
 	GdkRectangle    page_area;
 	GtkBorder       border;
+	EvRectangle     doc_rect, popup_rect;
+	EvPage         *page;
+	GdkColor        color;
+	GdkRectangle    view_rect;
+	cairo_region_t *region;
+
+	color = ev_view_annotation_color(view);
 
 	find_page_at_location (view, view->adding_annot_info.start.x, view->adding_annot_info.start.y, &annot_page, &offset, &offset);
 	if (annot_page == -1) {
@@ -3870,6 +3908,82 @@ ev_view_create_annotation_from_selection (EvView          *view,
 
 	ev_view_create_annotation_real (view, selection->page, doc_point_start, doc_point_end);
 }
+
+GdkColor
+ev_view_annotation_color(EvView  *view)
+{
+	GdkColor        color;
+
+	switch(view->adding_annot_info.type) 
+	{
+	case EV_ANNOTATION_TYPE_TEXT:
+		color.pixel = 0;
+		color.red = 65535;
+		color.green = 65535;
+		color.blue = 0;
+		return color;
+	case EV_ANNOTATION_TYPE_TEXT_MARKUP:
+		switch(view->adding_annot_info.markup_type)
+		{
+			case EV_ANNOTATION_TEXT_MARKUP_HIGHLIGHT:
+				switch(view->adding_annot_info.color)
+				{
+					case EV_ANNOTATION_COLOR_YELLOW:
+						color.pixel = 0;
+						color.red = 65535;
+						color.green = 65535;
+						color.blue = 0;
+						return color;
+					case EV_ANNOTATION_COLOR_CYAN:
+						color.pixel = 0;
+						color.red = 0;
+						color.green = 65535;
+						color.blue = 65535;
+						return color;
+					case EV_ANNOTATION_COLOR_GREEN:
+						color.pixel = 0;
+						color.red = 0;
+						color.green = 65535;
+						color.blue = 0;
+						return color;
+					case EV_ANNOTATION_COLOR_MAGENTA:
+						color.pixel = 0;
+						color.red = 65535;
+						color.green = 37522;
+						color.blue = 63993;
+						return color;
+				}
+			case EV_ANNOTATION_TEXT_MARKUP_UNDERLINE:
+				/* POSSIBLE FEATURE: MULTIPLE UNDERLINE COLORS? */
+				color.pixel = 0;
+				color.red = 0;
+				color.green = 0;
+				color.blue = 0;
+				return color;
+			case EV_ANNOTATION_TEXT_MARKUP_STRIKE_OUT:
+				/* POSSIBLE FEATURE: MULTIPLE STRIKETHROUGH COLORS? */
+				color.pixel = 0;
+				color.red = 0;
+				color.green = 0;
+				color.blue = 0;
+				return color;
+			case EV_ANNOTATION_TEXT_MARKUP_SQUIGGLY:
+				/* POSSIBLE FEATURE: MULTIPLE SQUIGGLY COLORS? */
+				color.pixel = 0;
+				color.red = 0;
+				color.green = 0;
+				color.blue = 0;
+				return color;
+		}
+	default:
+		color.pixel = 0;
+		color.red = 65535;
+		color.green = 65535;
+		color.blue = 0;
+		return color;
+	}
+}
+
 void
 ev_view_focus_annotation (EvView    *view,
 			  EvMapping *annot_mapping)
@@ -3882,9 +3996,8 @@ ev_view_focus_annotation (EvView    *view,
 				     ev_annotation_get_page_index (EV_ANNOTATION (annot_mapping->data)));
 }
 
-void
-ev_view_begin_add_annotation (EvView          *view,
-			      EvAnnotationType annot_type)
+void ev_view_begin_add_annotation(EvView *view,
+								  EvAnnotationType annot_type)
 {
 	if (annot_type == EV_ANNOTATION_TYPE_UNKNOWN)
 		return;
@@ -3894,7 +4007,131 @@ ev_view_begin_add_annotation (EvView          *view,
 
 	view->adding_annot_info.adding_annot = TRUE;
 	view->adding_annot_info.type = annot_type;
-	ev_view_set_cursor (view, EV_VIEW_CURSOR_ADD);
+	ev_view_set_cursor(view, EV_VIEW_CURSOR_ADD);
+}
+
+void
+ev_view_begin_add_annotation1 (EvView          *view,
+			      EvAnnotationType annot_type,
+			      EvAnnotationTextMarkupType annot_markup_type,
+			      EvAnnotationColor annot_color)
+{
+	if (annot_type == EV_ANNOTATION_TYPE_UNKNOWN)
+		return;
+
+	if (view->adding_annot_info.adding_annot)
+		return;
+
+	view->adding_annot_info.adding_annot = TRUE;
+	view->adding_annot_info.type = annot_type;
+
+	view->adding_annot_info.markup_type = annot_markup_type;
+
+	/* add color to struct here */
+	view->adding_annot_info.color = annot_color;
+
+	if((view->motion.x > 0 && view->motion.y > 0) || (view->selection_info.style > 0))
+	{
+		EvRectangle  rect;
+		GtkWindow  *parent;
+		GtkWidget  *window;
+		EvPoint      start;
+		EvPoint      end;
+		GdkRectangle page_area;
+		GtkBorder    border;
+		guint        annot_page;
+		EvViewSelection *selection;
+		GList *list;
+
+		EvRectangle  current_area;
+		EvRectangle area;
+		EvRectangle popup_rect;
+
+		view->adding_annot_info.text_preselected = 1;
+
+		if(view->selection_info.style > 0)
+		{
+			view->adding_annot_info.start.x = view->annot_selection_start.x;
+			view->adding_annot_info.start.y = view->annot_selection_start.y;
+
+			view->adding_annot_info.start.y += 5;
+
+			view->adding_annot_info.stop.x = view->annot_selection_stop.x;
+			view->adding_annot_info.stop.y = view->annot_selection_stop.y;
+		} else {
+			view->adding_annot_info.start.x = view->selection_info.start.x;
+			view->adding_annot_info.start.y = view->selection_info.start.y;
+
+
+			view->adding_annot_info.stop.x = view->motion.x;
+			view->adding_annot_info.stop.y = view->motion.y;
+		}
+
+		ev_view_create_annotation (view);
+
+		annot_page = ev_annotation_get_page_index (view->adding_annot_info.annot);
+		ev_view_get_page_extents (view, annot_page, &page_area, &border);
+
+		ev_annotation_get_area (view->adding_annot_info.annot, &current_area);
+		_ev_view_transform_view_point_to_doc_point (view, &view->adding_annot_info.start, &page_area, &border,
+							    &start.x, &start.y);
+		_ev_view_transform_view_point_to_doc_point (view, &view->adding_annot_info.stop, &page_area, &border,
+							    &end.x, &end.y);
+
+		switch (view->adding_annot_info.type) {
+			case EV_ANNOTATION_TYPE_TEXT:
+				rect.x1 = end.x;
+				rect.y1 = end.y;
+				rect.x2 = rect.x1 + current_area.x2 - current_area.x1;
+				rect.y2 = rect.y1 + current_area.y2 - current_area.y1;
+				break;
+			case EV_ANNOTATION_TYPE_TEXT_MARKUP:
+				rect.x1 = start.x;
+				rect.y1 = start.y;
+				rect.x2 = end.x;
+				rect.y2 = end.y;
+				break;
+			default:
+				g_assert_not_reached ();
+			}
+
+
+		ev_document_doc_mutex_lock ();
+		ev_annotation_set_area (view->adding_annot_info.annot, &rect);
+		ev_document_annotations_save_annotation (EV_DOCUMENT_ANNOTATIONS (view->document),
+								 view->adding_annot_info.annot,
+								 EV_ANNOTATIONS_SAVE_AREA);
+		
+		ev_document_doc_mutex_unlock ();
+
+		ev_annotation_get_area (view->adding_annot_info.annot, &area);
+
+		popup_rect.x1 = area.x2;
+		popup_rect.x2 = popup_rect.x1 + ANNOT_POPUP_WINDOW_DEFAULT_WIDTH;
+		popup_rect.y1 = area.y2;
+		popup_rect.y2 = popup_rect.y1 + ANNOT_POPUP_WINDOW_DEFAULT_HEIGHT;
+
+		if (ev_annotation_markup_set_rectangle (EV_ANNOTATION_MARKUP (view->adding_annot_info.annot),
+							&popup_rect)) {
+			ev_document_doc_mutex_lock ();
+			ev_document_annotations_save_annotation (EV_DOCUMENT_ANNOTATIONS (view->document),
+								 view->adding_annot_info.annot,
+								 EV_ANNOTATIONS_SAVE_POPUP_RECT);
+			ev_document_doc_mutex_unlock ();
+		}
+
+		parent = GTK_WINDOW (gtk_widget_get_toplevel (GTK_WIDGET (view)));
+		window = ev_view_create_annotation_window (view, view->adding_annot_info.annot, parent);
+		g_signal_emit (view, signals[SIGNAL_ANNOT_ADDED], 0, view->adding_annot_info.annot);
+
+		view->adding_annot_info.adding_annot = FALSE;
+		view->adding_annot_info.annot = NULL;
+		clear_selection (view);
+		return;
+	}
+
+	view->adding_annot_info.text_preselected = 0;
+
 }
 
 void
@@ -5397,10 +5634,26 @@ ev_view_query_tooltip (GtkWidget  *widget,
 	annot = ev_view_get_annotation_at_location (view, x, y);
 	if (annot) {
 		const gchar *contents;
-
-		contents = ev_annotation_get_contents (annot);
-		if (contents && *contents != '\0') {
+		int string_not_empty = 0;
+		if ((contents = ev_annotation_get_contents (annot))) {
 			GdkRectangle annot_area;
+			if (contents[0] == '\0') {
+				return FALSE;
+			} else {
+				for(int i = 0; i < sizeof(contents); i++)
+				{
+					if(!isspace(contents[i]))
+					{
+						string_not_empty = 1;
+						break;
+					}
+				}
+				if(string_not_empty == 0)
+				{
+					return FALSE;
+				}
+			}
+
 
 			get_annot_area (view, x, y, annot, &annot_area);
 			gtk_tooltip_set_text (tooltip, contents);
@@ -5408,6 +5661,7 @@ ev_view_query_tooltip (GtkWidget  *widget,
 
 			return TRUE;
 		}
+
 	}
 
 	field = ev_view_get_form_field_at_location (view, x, y);
@@ -5694,12 +5948,18 @@ ev_view_button_press_event (GtkWidget      *widget,
 
 					end_point.x = event->x + view->scroll_x;
 					end_point.y = event->y + view->scroll_y;
+					view->motion.x = end_point.x;
+					view->motion.y = end_point.y;
 					extend_selection (view, &view->selection_info.start, &end_point);
 				} else if (location_in_selected_text (view,
 							       event->x + view->scroll_x,
 							       event->y + view->scroll_y)) {
+					view->motion.x = 0;
+					view->motion.y = 0;
 					view->selection_info.in_drag = TRUE;
 				} else {
+					view->motion.x = 0;
+					view->motion.y = 0;
 					start_selection_for_event (view, event);
 					if (position_caret_cursor_for_event (view, event, TRUE)) {
 						view->cursor_blink_time = 0;
@@ -5752,11 +6012,6 @@ ev_view_button_press_event (GtkWidget      *widget,
 				_ev_view_set_focused_element (view, link, page);
 			} else if (!location_in_text (view, event->x + view->scroll_x, event->y + view->scroll_y) &&
 				   (image = ev_view_get_image_at_location (view, event->x, event->y))) {
-				if (view->image_dnd_info.image)
-					g_object_unref (view->image_dnd_info.image);
-				view->image_dnd_info.image = g_object_ref (image);
-				view->image_dnd_info.in_drag = TRUE;
-
 				view->image_dnd_info.start.x = event->x + view->scroll_x;
 				view->image_dnd_info.start.y = event->y + view->scroll_y;
 			} else {
@@ -6340,7 +6595,53 @@ ev_view_get_selected_text (EvView *view)
  * Since: 3.30
  */
 gboolean
-ev_view_add_text_markup_annotation_for_selected_text (EvView  *view)
+ev_view_add_text_markup_annotation_for_selected_text(EvView *view)
+{
+	GList *l;
+
+	if (view->adding_annot_info.annot || view->adding_annot_info.adding_annot ||
+		view->selection_info.selections == NULL)
+		return FALSE;
+
+	for (l = view->selection_info.selections; l != NULL; l = l->next)
+	{
+		EvViewSelection *selection = (EvViewSelection *)l->data;
+
+		view->adding_annot_info.adding_annot = TRUE;
+		view->adding_annot_info.type = EV_ANNOTATION_TYPE_TEXT_MARKUP;
+
+		ev_view_create_annotation_from_selection(view, selection);
+
+		if (view->adding_annot_info.adding_annot)
+			g_signal_emit(view, signals[SIGNAL_ANNOT_ADDED], 0, view->adding_annot_info.annot);
+	}
+
+	clear_selection(view);
+
+	view->adding_annot_info.adding_annot = FALSE;
+	view->adding_annot_info.annot = NULL;
+
+	return TRUE;
+}
+
+/**
+ * ev_view_add_text_markup_annotation_for_selected_text:
+ * @view: #EvView instance
+ *
+ * Adds a Text Markup annotation (defaulting to a 'highlight' one) to
+ * the currently selected text on the document.
+ *
+ * When the selected text spans more than one page, it will add a
+ * corresponding annotation for each page that contains selected text.
+ *
+ * Returns: %TRUE if annotations were added successfully, %FALSE otherwise.
+ *
+ * Since: 3.30
+ */
+gboolean
+ev_view_add_text_markup_annotation_for_selected_text1 (EvView  *view,
+									EvAnnotationTextMarkupType annot_markup_type,
+									EvAnnotationColor	annot_color)
 {
 	GList *l;
 
@@ -6353,6 +6654,8 @@ ev_view_add_text_markup_annotation_for_selected_text (EvView  *view)
 
 		view->adding_annot_info.adding_annot = TRUE;
 		view->adding_annot_info.type = EV_ANNOTATION_TYPE_TEXT_MARKUP;
+		view->adding_annot_info.markup_type = annot_markup_type;
+		view->adding_annot_info.color = annot_color;
 
 		ev_view_create_annotation_from_selection (view, selection);
 
@@ -6503,10 +6806,11 @@ ev_view_button_release_event (GtkWidget      *widget,
 			
 		view->adding_annot_info.stop.x = event->x + view->scroll_x;
 		view->adding_annot_info.stop.y = event->y + view->scroll_y;
-		if (annot_added)
-			g_signal_emit (view, signals[SIGNAL_ANNOT_ADDED], 0, view->adding_annot_info.annot);
-		else
-			g_signal_emit (view, signals[SIGNAL_ANNOT_CANCEL_ADD], 0, NULL);
+		if (annot_added) {
+			g_signal_emit(view, signals[SIGNAL_ANNOT_ADDED], 0, view->adding_annot_info.annot);
+		} else {
+			g_signal_emit(view, signals[SIGNAL_ANNOT_CANCEL_ADD], 0, NULL);
+		}
 
 		view->adding_annot_info.adding_annot = FALSE;
 		view->adding_annot_info.annot = NULL;
@@ -10077,6 +10381,12 @@ merge_selection_region (EvView *view,
 				rect.y += page_area.y + border.top - view->scroll_y - 2;
 				rect.width += 4;
 				rect.height += 4;
+
+				view->annot_selection_start.x = rect.x + view->scroll_x;
+				view->annot_selection_start.y = rect.y + view->scroll_y;
+				view->annot_selection_stop.x = rect.x + rect.width + view->scroll_x - 6;
+				view->annot_selection_stop.y = rect.y + rect.height + view->scroll_y - 6;
+
 				cairo_region_union_rectangle (damage_region, &rect);
 			}
 			cairo_region_destroy (region);
@@ -10115,7 +10425,10 @@ selection_free (EvViewSelection *selection)
 static void
 clear_selection (EvView *view)
 {
-	merge_selection_region (view, NULL);
+	merge_selection_region(view, NULL);
+	
+	view->motion.x = 0;
+	view->motion.y = 0;
 }
 
 void

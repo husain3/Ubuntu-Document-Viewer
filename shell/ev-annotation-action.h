@@ -27,30 +27,33 @@
 
 G_BEGIN_DECLS
 
-#define EV_TYPE_ANNOTATION_ACTION (ev_annotation_action_get_type())
-#define EV_ANNOTATION_ACTION(obj) (G_TYPE_CHECK_INSTANCE_CAST((obj), EV_TYPE_ANNOTATION_ACTION, EvAnnotationAction))
-#define EV_IS_ANNOTATION_ACTION(obj) (G_TYPE_CHECK_INSTANCE_TYPE((obj), EV_TYPE_ANNOTATION_ACTION))
-#define EV_ANNOTATION_ACTION_CLASS(klass) (G_TYPE_CHECK_CLASS_CAST((klass), EV_TYPE_ANNOTATION_ACTION, EvAnnotationActionClass))
-#define EV_IS_ANNOTATION_ACTION_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE((obj), EV_TYPE_ANNOTATION_ACTION))
-#define EV_ANNOTATION_ACTION_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS((obj), EV_TYPE_ANNOTATION_ACTION, EvAnnotationActionClass))
+#define EV_TYPE_ANNOTATION_ACTION            (ev_annotation_action_get_type ())
+#define EV_ANNOTATION_ACTION(obj)            (G_TYPE_CHECK_INSTANCE_CAST ((obj), EV_TYPE_ANNOTATION_ACTION, EvAnnotationAction))
+#define EV_IS_ANNOTATION_ACTION(obj)         (G_TYPE_CHECK_INSTANCE_TYPE ((obj), EV_TYPE_ANNOTATION_ACTION))
+#define EV_ANNOTATION_ACTION_CLASS(klass)    (G_TYPE_CHECK_CLASS_CAST ((klass), EV_TYPE_ANNOTATION_ACTION, EvAnnotationActionClass))
+#define EV_IS_ANNOTATION_ACTION_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((obj), EV_TYPE_ANNOTATION_ACTION))
+#define EV_ANNOTATION_ACTION_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS((obj), EV_TYPE_ANNOTATION_ACTION, EvAnnotationActionClass))
 
-typedef struct _EvAnnotationAction EvAnnotationAction;
-typedef struct _EvAnnotationActionClass EvAnnotationActionClass;
+typedef struct _EvAnnotationAction        EvAnnotationAction;
+typedef struct _EvAnnotationActionClass   EvAnnotationActionClass;
 
-struct _EvAnnotationAction
-{
-    GtkBox parent;
+struct _EvAnnotationAction {
+        GtkBox parent;
 };
 
-struct _EvAnnotationActionClass
-{
-    GtkBoxClass parent_class;
+struct _EvAnnotationActionClass {
+        GtkBoxClass parent_class;
 };
 
 typedef enum
 {
-    EV_ANNOTATION_ACTION_TYPE_NOTE,
-    EV_ANNOTATION_ACTION_TYPE_HIGHLIGHT
+        EV_ANNOTATION_ACTION_TYPE_HIGHLIGHT,
+        EV_ANNOTATION_ACTION_TYPE_HIGHLIGHT_YELLOW,
+        EV_ANNOTATION_ACTION_TYPE_HIGHLIGHT_BLUE,
+        EV_ANNOTATION_ACTION_TYPE_HIGHLIGHT_PINK,
+        EV_ANNOTATION_ACTION_TYPE_HIGHLIGHT_GREEN,
+        EV_ANNOTATION_ACTION_TYPE_NOTE
+
 } EvAnnotationActionType;
 
 GType
