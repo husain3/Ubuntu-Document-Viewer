@@ -165,13 +165,30 @@
         <attribute name="action">win.select-annotation</attribute>
         <attribute name="target">green_highlight</attribute>
       </item>
+    </section>
+    <section>
       <item>
-        <attribute name="label" translatable="yes">_Note Text</attribute>
+        <attribute name="label" translatable="yes">_Underline</attribute>
         <attribute name="action">win.select-annotation</attribute>
-        <attribute name="target">note</attribute>
+        <attribute name="target">underline</attribute>
+      </item>
+      <item>
+        <attribute name="label" translatable="yes">_Strikethrough</attribute>
+        <attribute name="action">win.select-annotation</attribute>
+        <attribute name="target">strikethrough</attribute>
+      </item>
+      <item>
+        <attribute name="label" translatable="yes">_Squiggly</attribute>
+        <attribute name="action">win.select-annotation</attribute>
+        <attribute name="target">squiggly</attribute>
       </item>
     </section>
     <section>
+      <item>
+        <attribute name="label" translatable="yes">_Note</attribute>
+        <attribute name="action">win.select-annotation</attribute>
+        <attribute name="target">note</attribute>
+      </item>
     </section>
   </menu>
 
