@@ -779,7 +779,7 @@ ev_annotation_set_area (EvAnnotation      *annot,
 
 gboolean
 ev_annotation_set_preselected_area (EvAnnotation      *annot,
-									const EvRectangle *area)
+                                    const EvRectangle *area)
 {
 	gboolean was_initial;
 
